@@ -8,7 +8,7 @@ export function Account() {
       <Sidebar />
 
       <main className="pt-16 sm:pt-0 sm:pl-60">
-        <div className="mx-auto max-w-176 px-pad pt-14 pb-24 sm:pt-[18svh]">
+        <div className="px-pad pt-14 pb-24 sm:pt-[18svh]">
           <Outlet />
         </div>
       </main>
