@@ -7,7 +7,7 @@ export function Account() {
     <div className="relative z-10 min-h-svh bg-ground text-ink">
       <Sidebar />
 
-      <main className="pt-16 sm:pt-0 sm:pl-60">
+      <main className="pt-16 sm:pt-0 sm:pl-72">
         <div className="px-pad pt-14 pb-24 sm:pt-[18svh]">
           <Outlet />
         </div>
