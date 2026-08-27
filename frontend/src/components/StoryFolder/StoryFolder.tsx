@@ -84,7 +84,7 @@ export function StoryFolder() {
       <div className="mx-auto max-w-page">
         <h2 className="mt-6 mb-[clamp(52px,9vh,92px)] text-[clamp(30px,4.6vw,56px)] font-light leading-[1.08] tracking-[-0.015em] text-balance text-ink text-center">
           The same server - 
-          <span className="text-ink-3"> one login away.</span>
+          <span className="text-ink-3"> one login away</span>
         </h2>
 
         <div className="sf-stack">

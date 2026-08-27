@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createScene } from '@/scene'
 import type { SceneHandle, StageName } from '@/scene'
 
@@ -14,6 +14,7 @@ export function Void({ stage, onDock }: VoidProps) {
   const sceneRef = useRef<SceneHandle | null>(null)
   const onDockRef = useRef(onDock)
   const stageRef = useRef(stage)
+  const [launched, setLaunched] = useState(stage !== 'hero')
 
   useEffect(() => {
     onDockRef.current = onDock
@@ -36,7 +37,10 @@ export function Void({ stage, onDock }: VoidProps) {
     sceneRef.current = scene
 
     const onResize = () => scene.resize()
-    const onLaunch = () => scene.launch()
+    const onLaunch = () => {
+      scene.launch()
+      setLaunched(true)
+    }
 
     const onScroll = () => scene.setScroll(window.scrollY / window.innerHeight)
 
@@ -45,7 +49,7 @@ export function Void({ stage, onDock }: VoidProps) {
     }
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key.startsWith('Arrow') || e.key === ' ' || e.key === 'PageDown') scene.launch()
+      if (e.key.startsWith('Arrow') || e.key === ' ' || e.key === 'PageDown') onLaunch()
     }
 
     const onPointerMove = (e: PointerEvent) => {
@@ -95,10 +99,18 @@ export function Void({ stage, onDock }: VoidProps) {
   }, [stage])
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className="fixed inset-0 z-0 block h-dvh w-full"
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="fixed inset-0 z-0 block h-dvh w-full"
+      />
+
+      <p
+        className={`pointer-events-none fixed inset-x-0 top-[53svh] z-10 mx-auto px-pad text-center text-[clamp(16px,2vw,20px)] transition-opacity duration-500 ${launched ? 'opacity-0' : 'opacity-100'}`}>
+        Spare room on your server, and an SSH session every time you want to open a holiday picture?
+        <span className="mt-5 block text-ink-3">scroll..</span>
+      </p>
+    </>
   )
 }

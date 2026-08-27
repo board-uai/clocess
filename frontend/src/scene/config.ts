@@ -90,7 +90,7 @@ export interface Stage {
 
 /** every state the scene settles at, flights just interpolate between two */
 export const STAGE = {
-  opening: { w: START_CAMERA, y: 0.5, room: 1, exit: 0 },
+  opening: { w: START_CAMERA, y: 0.4, room: 1, exit: 0 },
   hero: { w: DOCK_W_DEF, y: DOCK_Y, room: 1, exit: 0 },
   /* same framing as hero, the camera travel is what moves, not the pose */
   auth: { w: DOCK_W_DEF, y: DOCK_Y, room: 0, exit: 1 },
