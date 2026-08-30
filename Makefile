@@ -15,3 +15,6 @@ migrate-create:
 
 migrate-status:
 	goose -dir backend/db/migrations postgres "$(DB_URL)" status
+
+db-reset:
+	docker exec -i clocess_db psql -U $(DB_USER) -d $(DB_NAME) -c "drop schema public cascade; create schema public;"
