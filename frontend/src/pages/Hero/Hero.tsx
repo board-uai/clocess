@@ -1,8 +1,8 @@
 import { useLocation } from 'react-router-dom'
-import { Footer } from '@/components/Footer/Footer'
-import { Reach } from '@/components/Reach/Reach'
-import { Reach_2 } from '@/components/Reach_2/Reach_2'
-import { StoryFolder } from '@/components/StoryFolder'
+import { Footer } from '@/layout/Footer'
+import { StorageCanvas } from './sections/StorageCanvas'
+import { FeatureCards } from './sections/FeatureCards'
+import { StoryFolder } from './sections/StoryFolder'
 import { SAY_Y } from '@/scene'
 
 export function Hero() {
@@ -18,7 +18,7 @@ export function Hero() {
       </p>
 
       <section className="exit-fade pointer-events-none absolute inset-x-0 top-[52svh] z-10 px-pad">
-        <Reach />
+        <StorageCanvas />
       </section>
 
       {atHome && (
@@ -27,7 +27,7 @@ export function Hero() {
 
           <StoryFolder />
 
-          <Reach_2 />
+          <FeatureCards />
 
           <Footer />
         </>

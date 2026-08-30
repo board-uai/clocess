@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { AuthForm } from '@/components/AuthForm'
+import { AuthForm } from '@/auth'
 import { register } from '@/lib/api'
 
 export function Register() {

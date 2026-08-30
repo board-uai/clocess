@@ -1,5 +1,5 @@
 import { FOV } from '../config'
-import type { Pose } from '@/types/scene'
+import type { Pose } from '../types'
 
 export interface CameraSolution {
   x: number

@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { deleteFile, listFiles, uploadFile } from '@/lib/api'
 import type { FileRecord } from '@/lib/api'
 
-type Status = 'loading' | 'ready' | 'failed'
+export type FilesStatus = 'loading' | 'ready' | 'failed'
 
 /** the list is the server's, every write re-asks rather than patching it locally */
 export function useFiles() {
   const [files, setFiles] = useState<FileRecord[]>([])
-  const [status, setStatus] = useState<Status>('loading')
+  const [status, setStatus] = useState<FilesStatus>('loading')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 

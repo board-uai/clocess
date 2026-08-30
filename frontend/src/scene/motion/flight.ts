@@ -1,6 +1,6 @@
 import { ROOM_LATE } from '../config'
 import type { Stage } from '../config'
-import type { Pose } from '@/types/scene'
+import type { Pose } from '../types'
 
 /** smootherstep, flat acceleration at both ends so nothing jolts on departure */
 export function ease(u: number): number {

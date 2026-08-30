@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { Navbar } from '@/components/Navbar'
-import { Void } from '@/components/Void'
-import { Hero } from '@/pages/Hero'
+import { Navbar } from '@/layout/Navbar'
+import { Void } from '@/layout/Void'
+import { Hero } from '@/pages/Hero/Hero'
 import { Login } from '@/pages/Login'
 import { Account, Dashboard, Profile, Server } from '@/pages/Account'
 import { RequireAuth } from '@/auth'
 import { Register } from '@/pages/Register'
 import { AUTH_DUR } from '@/scene'
 import type { StageName } from '@/scene'
-// import { useAnimatedFavicon } from './hooks/useAnimatedFav'
 
 /** the url is the source of truth for where the logo sits */
 function stageFor(pathname: string): StageName {
@@ -17,8 +16,6 @@ function stageFor(pathname: string): StageName {
 }
 
 function App() {
-  // favicon animation parked, the tab keeps the static icon from index.html
-  // useAnimatedFavicon()
   const location = useLocation()
   const navigate = useNavigate()
   const [docked, setDocked] = useState(false)

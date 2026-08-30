@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { useSession } from '../session'
+import { useSession } from './session'
 
 /** the session cookie is httponly, so only the server can say whether it is still good */
 export function RequireAuth() {
