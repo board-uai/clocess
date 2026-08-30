@@ -4,7 +4,7 @@ import { Navbar } from '@/components/Navbar'
 import { Void } from '@/components/Void'
 import { Hero } from '@/pages/Hero'
 import { Login } from '@/pages/Login'
-import { Account, Dashboard, Profile } from '@/pages/Account'
+import { Account, Dashboard, Profile, Server } from '@/pages/Account'
 import { RequireAuth } from '@/auth'
 import { Register } from '@/pages/Register'
 import { AUTH_DUR } from '@/scene'
@@ -65,6 +65,7 @@ function App() {
           <Route path="/account" element={<Account />}>
             <Route index element={<Profile />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="server" element={<Server />} />
           </Route>
         </Route>
       </Routes>

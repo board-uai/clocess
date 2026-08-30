@@ -1,8 +1,15 @@
+import { Container } from '@/components/ui/Container'
+
 export function Dashboard() {
-return (
-    <section>
-    <h1 className="mb-8 text-[22px]">dashboard</h1>
-    <p className="text-[15px] text-ink-3">nothing here yet</p>
+  return (
+    <section className="grid gap-5 sm:grid-cols-[1fr_1.4fr]">
+      <Container className="flex min-h-100 items-center justify-center">
+        <p className="text-4xl"></p>
+      </Container>
+
+      <Container className="min-h-44">{}</Container>
+
+      <Container className="min-h-100 sm:col-span-2">{}</Container>
     </section>
-)
+  )
 }
