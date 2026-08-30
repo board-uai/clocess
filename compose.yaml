@@ -1,6 +1,6 @@
 services:
   postgres:
-    container_name: webDAV_db
+    container_name: clocess_db
     image: postgres:17-alpine
     env_file:
       - .env
@@ -12,7 +12,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   redis:
-    container_name: webDAV_redis
+    container_name: clocess_redis
     image: redis:latest
     volumes:
       - ./backend/cache/redis.conf:/usr/local/etc/redis/redis.conf
@@ -21,7 +21,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf --requirepass ${REDIS_PASSWORD}
 
   backend:
-    container_name: webDAV_backend
+    container_name: clocess_backend
     build:
       context: ./backend
     env_file:
@@ -32,7 +32,7 @@ services:
       - postgres
 
   frontend:
-    container_name: webDAV_frontend
+    container_name: clocess_frontend
     build:
       context: ./frontend
     env_file:

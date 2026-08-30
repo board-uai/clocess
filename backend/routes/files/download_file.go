@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ArtemKucheruk/webDAV.git/db"
-	"github.com/ArtemKucheruk/webDAV.git/db/sqlc"
-	"github.com/ArtemKucheruk/webDAV.git/storage"
+	"github.com/board-uai/clocess/db"
+	"github.com/board-uai/clocess/db/sqlc"
+	"github.com/board-uai/clocess/storage"
 
-	"github.com/ArtemKucheruk/webDAV.git/cache"
+	"github.com/board-uai/clocess/cache"
 	"github.com/labstack/echo/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"

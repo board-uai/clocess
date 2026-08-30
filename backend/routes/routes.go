@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"github.com/ArtemKucheruk/webDAV.git/routes/auth"
-	"github.com/ArtemKucheruk/webDAV.git/routes/files"
-	"github.com/ArtemKucheruk/webDAV.git/routes/settings"
-	"github.com/ArtemKucheruk/webDAV.git/storage"
+	"github.com/board-uai/clocess/routes/auth"
+	"github.com/board-uai/clocess/routes/files"
+	"github.com/board-uai/clocess/routes/settings"
+	"github.com/board-uai/clocess/storage"
 	"github.com/labstack/echo/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"

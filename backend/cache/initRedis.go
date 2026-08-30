@@ -3,7 +3,7 @@ package cache
 import (
 	"context"
 
-	"github.com/ArtemKucheruk/webDAV.git/utils"
+	"github.com/board-uai/clocess/utils"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 )

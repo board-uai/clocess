@@ -1,4 +1,4 @@
-module github.com/ArtemKucheruk/webDAV.git
+module github.com/board-uai/clocess
 
 go 1.26.2
 
