@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ArtemKucheruk/webDAV.git/utils"
+	"github.com/board-uai/clocess/utils"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
 )

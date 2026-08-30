@@ -21,8 +21,8 @@ definitions:
     type: object
 info:
   contact: {}
-  description: This is an API for webDAV project
-  title: webDAV backend API
+  description: This is an API for clocess project
+  title: clocess backend API
   version: "1.0"
 paths:
   /file/delete:

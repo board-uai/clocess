@@ -5,17 +5,17 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/ArtemKucheruk/webDAV.git/cache"
-	"github.com/ArtemKucheruk/webDAV.git/db"
-	_ "github.com/ArtemKucheruk/webDAV.git/docs"
-	"github.com/ArtemKucheruk/webDAV.git/routes"
-	"github.com/ArtemKucheruk/webDAV.git/storage"
-	"github.com/ArtemKucheruk/webDAV.git/utils"
+	"github.com/board-uai/clocess/cache"
+	"github.com/board-uai/clocess/db"
+	_ "github.com/board-uai/clocess/docs"
+	"github.com/board-uai/clocess/routes"
+	"github.com/board-uai/clocess/storage"
+	"github.com/board-uai/clocess/utils"
 )
 
-// @title webDAV backend API
+// @title clocess backend API
 // @version 1.0
-// @description This is an API for webDAV project
+// @description This is an API for clocess project
 // @BasePath /api
 
 func main() {

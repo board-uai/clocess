@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ArtemKucheruk/webDAV.git/utils"
+	"github.com/board-uai/clocess/utils"
 	"github.com/labstack/echo/v5"
 	redis "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"

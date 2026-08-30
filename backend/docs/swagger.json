@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is an API for webDAV project",
-        "title": "webDAV backend API",
+        "description": "This is an API for clocess project",
+        "title": "clocess backend API",
         "contact": {},
         "version": "1.0"
     },
