@@ -8,12 +8,12 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type userAuthInfo struct {
+type userAuthDTO struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func (u userAuthInfo) ValidateUserAuthInfo(logger *zerolog.Logger) error {
+func (u userAuthDTO) ValidateUserAuthInfo(logger *zerolog.Logger) error {
 	if _, err := mail.ParseAddress(u.Email); err != nil {
 		logger.Err(err).Str("email", u.Email).Msg("invalid email on register")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid email")

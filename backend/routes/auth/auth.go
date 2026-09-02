@@ -21,14 +21,14 @@ import (
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        body  body      userAuthInfo  true  "email + password (min 8 chars)"
+// @Param        body  body      userAuthDTO true  "email + password (min 8 chars)"
 // @Success      201   {object}  map[string]any
 // @Failure      400   {object}  map[string]string  "invalid body / invalid email / password too short"
 // @Failure      409   {object}  map[string]string  "email already registered"
 // @Failure      500   {object}  map[string]string
 // @Router       /user/create [post]
 func RegisterUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
-	var userData userAuthInfo
+	var userData userAuthDTO
 	if err := c.Bind(&userData); err != nil {
 		logger.Err(err).Msg("failed to bind user registry data")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")
@@ -73,14 +73,14 @@ func RegisterUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) 
 // @Tags         auth
 // @Accept       json
 // @Produce      json
-// @Param        body  body      userAuthInfo  true  "email + password"
+// @Param        body  body      userAuthDTO  true  "email + password"
 // @Success      200   {object}  map[string]any
 // @Failure      400   {object}  map[string]string
 // @Failure      401   {object}  map[string]string  "invalid credentials"
 // @Failure      500   {object}  map[string]string
 // @Router       /user/login [post]
 func LoginUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
-	var userData userAuthInfo
+	var userData userAuthDTO
 	if err := c.Bind(&userData); err != nil {
 		logger.Err(err).Msg("failed to bind user registry data")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")

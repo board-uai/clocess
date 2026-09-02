@@ -17,14 +17,14 @@ import (
 // @Description  Requires an active session and confirmation of the current password
 // @Tags         settings
 // @Accept       json
-// @Param        body  body      changeUserPasswordRequest  true  "old_password + new_password (min 8 chars)"
+// @Param        body  body      changeUserPasswordDTO  true  "old_password + new_password (min 8 chars)"
 // @Success      200   "password changed"
 // @Failure      400   {object}  map[string]string  "invalid body / password too short"
 // @Failure      401   {object}  map[string]string  "invalid session / wrong old password"
 // @Failure      500   {object}  map[string]string
 // @Router       /user/settings/change_password [patch]
 func ChangeUserPassword(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
-	var changeUserPasswordData changeUserPasswordRequest
+	var changeUserPasswordData changeUserPasswordDTO
 	ctx := c.Request().Context()
 	if err := c.Bind(&changeUserPasswordData); err != nil {
 		logger.Err(err).Msg("failed to bind user registry data")

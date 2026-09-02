@@ -1,18 +1,18 @@
 basePath: /api
 definitions:
-  auth.userAuthInfo:
+  auth.userAuthDTO:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  files.deleteFileRequest:
+  files.deleteFileDTO:
     properties:
       file_id:
         type: integer
     type: object
-  settings.changeUserPasswordRequest:
+  settings.changeUserPasswordDTO:
     properties:
       old_password:
         type: string
@@ -35,7 +35,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/files.deleteFileRequest'
+          $ref: '#/definitions/files.deleteFileDTO'
       responses:
         "200":
           description: OK
@@ -183,7 +183,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/auth.userAuthInfo'
+          $ref: '#/definitions/auth.userAuthDTO'
       produces:
       - application/json
       responses:
@@ -225,7 +225,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/auth.userAuthInfo'
+          $ref: '#/definitions/auth.userAuthDTO'
       produces:
       - application/json
       responses:
@@ -308,7 +308,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/settings.changeUserPasswordRequest'
+          $ref: '#/definitions/settings.changeUserPasswordDTO'
       responses:
         "200":
           description: password changed

@@ -24,7 +24,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/files.deleteFileRequest"
+                            "$ref": "#/definitions/files.deleteFileDTO"
                         }
                     }
                 ],
@@ -253,7 +253,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.userAuthInfo"
+                            "$ref": "#/definitions/auth.userAuthDTO"
                         }
                     }
                 ],
@@ -315,7 +315,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.userAuthInfo"
+                            "$ref": "#/definitions/auth.userAuthDTO"
                         }
                     }
                 ],
@@ -436,7 +436,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/settings.changeUserPasswordRequest"
+                            "$ref": "#/definitions/settings.changeUserPasswordDTO"
                         }
                     }
                 ],
@@ -507,7 +507,7 @@
         }
     },
     "definitions": {
-        "auth.userAuthInfo": {
+        "auth.userAuthDTO": {
             "type": "object",
             "properties": {
                 "email": {
@@ -518,7 +518,7 @@
                 }
             }
         },
-        "files.deleteFileRequest": {
+        "files.deleteFileDTO": {
             "type": "object",
             "properties": {
                 "file_id": {
@@ -526,7 +526,7 @@
                 }
             }
         },
-        "settings.changeUserPasswordRequest": {
+        "settings.changeUserPasswordDTO": {
             "type": "object",
             "properties": {
                 "old_password": {
