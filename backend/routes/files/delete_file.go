@@ -12,22 +12,18 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type deleteFileRequest struct {
-	FileID int32 `json:"file_id"`
-}
-
 // DeleteFile godoc
 // @Summary      Delete a file
 // @Tags         files
 // @Accept       json
-// @Param        body  body  deleteFileRequest  true  "file_id"
+// @Param        body  body  deleteFileDTO  true  "file_id"
 // @Success      200
 // @Failure      400  {object}  map[string]string
 // @Failure      401  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
 // @Router       /file/delete [post]
 func DeleteFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage) error {
-	var deleteFileRequest deleteFileRequest
+	var deleteFileRequest deleteFileDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
 	if err != nil {

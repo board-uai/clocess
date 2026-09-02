@@ -7,12 +7,12 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type changeUserPasswordRequest struct {
+type changeUserPasswordDTO struct {
 	NewPassword string `json:"password"`
 	OldPassword string `json:"old_password"`
 }
 
-func (c changeUserPasswordRequest) ValidateUserPassword(logger *zerolog.Logger) error {
+func (c changeUserPasswordDTO) ValidateUserPassword(logger *zerolog.Logger) error {
 	if len(c.NewPassword) < 8 {
 		return echo.NewHTTPError(http.StatusBadRequest, "password should be min 8 characters")
 	}

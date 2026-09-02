@@ -17,10 +17,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type downloadFileRequest struct {
-	FileID int32 `query:"file_id"`
-}
-
 var quoteEscaper = strings.NewReplacer(`\`, `\\`, `"`, `\"`)
 
 // DownloadUserFile godoc
@@ -34,7 +30,7 @@ var quoteEscaper = strings.NewReplacer(`\`, `\\`, `"`, `\"`)
 // @Failure      500  {object}  map[string]string
 // @Router       /file/download [get]
 func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage) error {
-	var downloadFileData downloadFileRequest
+	var downloadFileData downloadFileDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
 	if err != nil {

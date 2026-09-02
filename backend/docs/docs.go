@@ -31,7 +31,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/files.deleteFileRequest"
+                            "$ref": "#/definitions/files.deleteFileDTO"
                         }
                     }
                 ],
@@ -260,7 +260,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.userAuthInfo"
+                            "$ref": "#/definitions/auth.userAuthDTO"
                         }
                     }
                 ],
@@ -322,7 +322,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.userAuthInfo"
+                            "$ref": "#/definitions/auth.userAuthDTO"
                         }
                     }
                 ],
@@ -443,7 +443,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/settings.changeUserPasswordRequest"
+                            "$ref": "#/definitions/settings.changeUserPasswordDTO"
                         }
                     }
                 ],
@@ -514,7 +514,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.userAuthInfo": {
+        "auth.userAuthDTO": {
             "type": "object",
             "properties": {
                 "email": {
@@ -525,7 +525,7 @@ const docTemplate = `{
                 }
             }
         },
-        "files.deleteFileRequest": {
+        "files.deleteFileDTO": {
             "type": "object",
             "properties": {
                 "file_id": {
@@ -533,7 +533,7 @@ const docTemplate = `{
                 }
             }
         },
-        "settings.changeUserPasswordRequest": {
+        "settings.changeUserPasswordDTO": {
             "type": "object",
             "properties": {
                 "old_password": {

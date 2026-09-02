@@ -19,7 +19,6 @@ import (
 // @Failure      401  {object}  map[string]string  "invalid session"
 // @Failure      500  {object}  map[string]string
 // @Router       /user/settings/deactivate [post]
-
 func DeactivateUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
 	ctx := c.Request().Context()
 

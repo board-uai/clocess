@@ -16,10 +16,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type fileUploadStruct struct {
-	File *multipart.FileHeader `form:"file"`
-}
-
 // UploadUserFile godoc
 // @Summary      Upload a file
 // @Tags         files
@@ -32,7 +28,7 @@ type fileUploadStruct struct {
 // @Failure      500   {object}  map[string]string
 // @Router       /file/upload [post]
 func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage) error {
-	var fileUploadData fileUploadStruct
+	var fileUploadData fileUploadDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
 	if err != nil {
