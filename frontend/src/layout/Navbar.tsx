@@ -4,7 +4,7 @@ import { useSession } from "@/auth";
 
 const DESTINATIONS = [
   { label: "docs", href: "#" },
-  { label: "github", href: "#" },
+  { label: "github", href: "https://github.com/board-uai/clocess" },
 ];
 
 interface NavbarProps {
@@ -24,7 +24,7 @@ export function Navbar({ atAuth, onLeave }: NavbarProps) {
         <ul className="flex items-center gap-8 sm:gap-12">
           {DESTINATIONS.map(({ label, href }) => (
             <li key={label}>
-              <Button variant="quiet" href={href}>
+              <Button variant="quiet" href={href} target="_blank">
                 {label}
               </Button>
             </li>
