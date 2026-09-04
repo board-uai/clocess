@@ -31,7 +31,7 @@ import { SKY_FRAG, SKY_VERT } from './shaders/env'
 import { poseOf, stageAt } from './motion/flight'
 import { loadLogo } from './geometry/decode'
 import { createLogoMaterial } from './shaders/logo'
-import type { SceneUniforms } from '@/types/scene'
+import type { SceneUniforms } from './types'
 
 export interface SceneHandle {
   resize(): void

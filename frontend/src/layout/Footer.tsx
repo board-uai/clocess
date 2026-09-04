@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/ui/Button'
 
 const MADE_BY = [
   { name: 'Danylo Patiuk', href: 'https://github.com/Patiukdanylo' },

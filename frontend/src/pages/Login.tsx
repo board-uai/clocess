@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { AuthForm } from '@/components/AuthForm'
+import { AuthForm } from '@/auth'
 import { useSession } from '@/auth'
 import { login } from '@/lib/api'
 

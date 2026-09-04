@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/ui/Button'
 import type { Credentials } from '@/lib/api'
 
 interface AuthFormProps {
@@ -59,7 +59,7 @@ export function AuthForm({
   }
 
   return (
-    <form onSubmit={submit} className="w-full max-w-[25rem]">
+    <form onSubmit={submit} className="w-full max-w-100">
       <h1 className="mb-8 text-center text-[22px] text-ink">{title}</h1>
 
       <div className="flex flex-col gap-4">

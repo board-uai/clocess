@@ -1,7 +1,7 @@
 import { DoubleSide, ShaderMaterial } from 'three'
 import { FILL_DIR, KEY_DIR } from '../config'
 import { ENV } from './env'
-import type { SceneUniforms } from '@/types/scene'
+import type { SceneUniforms } from '../types'
 
 export function createLogoMaterial(uniforms: SceneUniforms): ShaderMaterial {
   return new ShaderMaterial({

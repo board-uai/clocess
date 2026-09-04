@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom'
-import { Sidebar } from '@/components/ui/Sidebar'
+import { Sidebar } from './Sidebar'
 
 /** the rail is fixed, so the column has to hold its own width open */
 export function Account() {

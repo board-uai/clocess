@@ -1,6 +1,6 @@
 import { BufferAttribute, BufferGeometry } from 'three'
 import { GEO_URL } from '../config'
-import type { LogoGeometry } from '@/types/scene'
+import type { LogoGeometry } from '../types'
 
 /** "CGEO" | vcount u32 | icount u32 | centre 3f | half f */
 const HEADER_BYTES = 28
