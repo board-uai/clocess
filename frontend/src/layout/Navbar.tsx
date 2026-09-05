@@ -1,11 +1,15 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/ui/Button'
-import { useSession } from '@/auth'
+import { useSession, useSignOut } from '@/auth'
 
 const DESTINATIONS = [
   { label: 'docs', href: '#' },
   { label: 'github', href: '#' },
 ]
+
+const PILL =
+  'rounded-md bg-fill px-4 py-2 text-center text-[15px] whitespace-nowrap text-on-fill transition-opacity hover:opacity-80'
 
 interface NavbarProps {
   /** which set of actions the corner holds, the fade itself rides the flight */
@@ -16,6 +20,27 @@ interface NavbarProps {
 
 export function Navbar({ atAuth, onLeave }: NavbarProps) {
   const { user } = useSession()
+  const signOut = useSignOut()
+  const [open, setOpen] = useState(false)
+  const corner = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+
+    const onDown = (e: PointerEvent) => {
+      if (!corner.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+
+    document.addEventListener('pointerdown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
 
   return (
     <nav aria-label="Main" className="relative z-20">
@@ -31,14 +56,15 @@ export function Navbar({ atAuth, onLeave }: NavbarProps) {
         </ul>
 
         <div className="flex items-center gap-6">
-          <Button variant="quiet" to="/login">
-            sign in
-          </Button>
+          {!user && (
+            <>
+              <Button variant="quiet" to="/login">
+                sign in
+              </Button>
 
-          <Button to="/register">
-            register
-            <span aria-hidden="true"></span>
-          </Button>
+              <Button to="/register">register</Button>
+            </>
+          )}
 
           {/* always in the flow so nothing shifts, it only fades with the flight */}
           <Button
@@ -52,16 +78,30 @@ export function Navbar({ atAuth, onLeave }: NavbarProps) {
             return back
           </Button>
 
-          {/* the cookie is still good, so the account is one click away, no form */}
           {user && (
-            <Link
-              to="/account"
-              aria-label="your account"
-              title={user.email}
-              className="shrink-0 transition-opacity hover:opacity-70"
-            >
-              <img src="/svg/user.png" alt="" className="h-8 w-8" />
-            </Link>
+            <div ref={corner} className="relative shrink-0">
+              <button
+                type="button"
+                aria-label="your account"
+                aria-expanded={open}
+                onClick={() => setOpen((was) => !was)}
+                className="block transition-opacity hover:opacity-70"
+              >
+                <img src="/svg/user.png" alt="" className="h-8 w-8" />
+              </button>
+
+              {open && (
+                <div className="absolute left-1/2 top-full z-30 mt-3 flex -translate-x-1/2 gap-3">
+                  <Link to="/account" onClick={() => setOpen(false)} className={PILL}>
+                    account
+                  </Link>
+
+                  <button type="button" onClick={() => void signOut()} className={PILL}>
+                    sign out
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
