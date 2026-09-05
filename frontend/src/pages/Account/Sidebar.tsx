@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
+import { useSignOut } from '@/auth'
 
 const SECTIONS = [
   { label: 'Dashboard', to: '/account', end: true },
@@ -13,6 +14,8 @@ const REST = 'border-line bg-raise text-ink-3 hover:text-ink'
 const ON = 'border-transparent bg-fill text-on-fill'
 
 export function Sidebar() {
+  const signOut = useSignOut()
+
   return (
     <nav
       aria-label="Account"
@@ -37,12 +40,13 @@ export function Sidebar() {
       </ul>
 
       <div className="ml-auto flex items-center gap-3 sm:mt-auto sm:ml-0 sm:flex-col sm:items-stretch sm:gap-3">
-        <Link
-          to="/"
+        <button
+          type="button"
+          onClick={() => void signOut()}
           className="rounded-xl border border-line px-4 py-2 text-center text-[15px] text-ink-2 transition-colors hover:bg-fill hover:text-on-fill"
         >
           log out
-        </Link>
+        </button>
       </div>
     </nav>
   )
