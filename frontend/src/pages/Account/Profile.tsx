@@ -1,24 +1,17 @@
+import { Container } from '@/ui/Container'
 import { useAuth } from '@/auth'
 
-const ROW = 'flex items-baseline justify-between gap-6 border-b border-hair py-3'
-
 export function Profile() {
-const { user } = useAuth()
+  const { user } = useAuth()
 
-return (
+  return (
     <section>
-    <h1 className="mb-8 text-[22px]">account</h1>
+      <h1 className="mb-8 text-[22px]">Settings</h1>
 
-    <dl className="max-w-md">
-        <div className={ROW}>
-        <dt className="text-[15px] text-ink-3">email</dt>
-        <dd>{user.email}</dd>
-        </div>
-        <div className={ROW}>
-        <dt className="text-[15px] text-ink-3">id</dt>
-        <dd>{user.user_id}</dd>
-        </div>
-    </dl>
+      <Container className="max-w-md">
+        <p className="mb-2 text-[15px] text-ink-3">email</p>
+        <p className="text-[17px]">{user.email}</p>
+      </Container>
     </section>
-)
+  )
 }

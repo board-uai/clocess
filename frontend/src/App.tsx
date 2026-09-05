@@ -60,9 +60,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route element={<RequireAuth />}>
           <Route path="/account" element={<Account />}>
-            <Route index element={<Profile />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="server" element={<Server />} />
+            <Route index element={<Dashboard />} />
+            <Route path="servers" element={<Server />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
       </Routes>
