@@ -14,12 +14,11 @@ interface NavbarProps {
   onLeave: () => void
 }
 
-/** fixed, not sticky: in flow it would add its own height to every page */
 export function Navbar({ atAuth, onLeave }: NavbarProps) {
   const { user } = useSession()
 
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 top-0 z-20">
+    <nav aria-label="Main" className="relative z-20">
       <div className="mx-auto flex h-22 max-w-page items-center justify-between gap-8 px-pad">
         <ul className="flex items-center gap-8 sm:gap-12">
           {DESTINATIONS.map(({ label, href }) => (
