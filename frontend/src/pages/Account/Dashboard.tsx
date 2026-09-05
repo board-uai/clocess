@@ -2,14 +2,19 @@ import { Container } from '@/ui/Container'
 
 export function Dashboard() {
   return (
-    <section className="grid gap-5 sm:grid-cols-[1fr_1.4fr]">
-      <Container className="flex min-h-100 items-center justify-center">
-        <p className="text-4xl"></p>
-      </Container>
+    <section>
+      <h1 className="mb-8 text-[22px]">Dashboard</h1>
 
-      <Container className="min-h-44">{}</Container>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-6">
+        <Container className="min-h-40 sm:col-span-6" />
 
-      <Container className="min-h-100 sm:col-span-2">{}</Container>
+        <Container className="min-h-52 sm:col-span-2" />
+        <Container className="min-h-52 sm:col-span-2" />
+        <Container className="min-h-52 sm:col-span-2" />
+
+        <Container className="min-h-60 sm:col-span-3" />
+        <Container className="min-h-60 sm:col-span-3" />
+      </div>
     </section>
   )
 }
