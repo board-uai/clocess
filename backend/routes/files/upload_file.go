@@ -79,6 +79,9 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 		Filename: fileUploadData.File.Filename,
 		FileType: file_type,
 		DiskPath: file_path,
+		RemoteID: 1, // we ll need to fix this later.
+		// probably, automatically create a id=1 server as your machine
+		// maybe skip the main server, and user always needs to add a server before saving any data files
 	})
 	if err != nil {
 		logger.Err(err).Int32("file_id", file_id).Msg("failed to write record about new file")
