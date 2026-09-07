@@ -24,7 +24,7 @@ export function Profile() {
   const [deactivating, setDeactivating] = useState(false);
   const [deactivateError, setDeactivateError] = useState<string | null>(null);
 
-  const handleDeactivate = async (e: SyntheticEvent) => {
+  const handleDeactivate = async () => {
     if (deactivating) {
       return;
     }
