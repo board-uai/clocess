@@ -89,16 +89,16 @@ const MOCK_ALERTS: AlertEntry[] = [
   { id: "4", message: "device pairing pending" },
 ];
 
-function mockSeries(seed: number): TimeSeriesPoint[] {
+const mockSeries = (seed: number): TimeSeriesPoint[] => {
   return Array.from({ length: 24 }, (_, i) => ({
     t: i,
     value: Math.round(
       40 + 25 * Math.sin(i / 3 + seed) + 10 * Math.sin(i * 1.7 + seed),
     ),
   }));
-}
+};
 
-export function useDashboard() {
+export const useDashboard = () => {
   const [range, setRange] = useState<TimeRange>("24h");
   const [serverFilter, setServerFilter] = useState<string>("all");
   const [status, setStatus] = useState<DashboardStatus>("loading");
@@ -143,7 +143,7 @@ export function useDashboard() {
       diskUsed,
       diskTotal,
       avgCpu,
-      activateAlerts: alerts.length,
+      activeAlerts: alerts.length,
     };
   }, [servers, alerts]);
 
@@ -160,4 +160,4 @@ export function useDashboard() {
     serverFilter,
     setServerFilter,
   };
-}
+};
