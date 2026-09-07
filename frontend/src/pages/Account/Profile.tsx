@@ -1,8 +1,9 @@
 import { Container } from "@/ui/Container";
 import { Button } from "@/ui/Button";
-import { useAuth } from "@/auth";
+import { useAuth, useSession } from "@/auth";
 import { useState, type SyntheticEvent } from "react";
-import { changePassword } from "@/lib/api";
+import { changePassword, deactivate } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
 
 const FIELD =
   "w-full rounded-md border border-ink-3 bg-transparent px-4 py-3 text-[17px] text-ink transition-colors placeholder:text-ink-3 focus:border-ink-2";
@@ -11,11 +12,40 @@ const LABEL = "mb-2 block text-[15px] text-ink-2";
 export function Profile() {
   const { user } = useAuth();
 
+  const navigate = useNavigate();
+  const { refresh } = useSession();
+
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [pending, setPending] = useState(false);
+
+  const [deactivating, setDeactivating] = useState(false);
+  const [deactivateError, setDeactivateError] = useState<string | null>(null);
+
+  const handleDeactivate = async (e: SyntheticEvent) => {
+    if (deactivating) {
+      return;
+    }
+    if (!window.confirm("deactivate your account? this cannot be undone.")) {
+      return;
+    }
+
+    setDeactivateError(null);
+    setDeactivating(true);
+    try {
+      await deactivate();
+      navigate("/", { replace: true });
+      await refresh();
+    } catch (error) {
+      setDeactivateError(
+        error instanceof Error ? error.message : "something went wrong...",
+      );
+    } finally {
+      setDeactivating(false);
+    }
+  };
 
   const onSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -101,11 +131,17 @@ export function Profile() {
       {/* Placeholder button for now */}
       <Button
         type="submit"
-        disabled={pending}
+        onClick={handleDeactivate}
+        disabled={deactivating}
         className="w-50 mt-5 rounded-2xl border border-red-500 px-7 py-2.5 text-center text-[17px] text-white transition-colors hover:bg-red-600 bg-red-500"
       >
-        Deactivate Account
+        {deactivating ? "deactivating..." : "deactivate account"}
       </Button>
+      {deactivateError && (
+        <p role="alert" className="text-[15px] text-red-400">
+          {error}
+        </p>
+      )}
     </section>
   );
 }
