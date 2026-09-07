@@ -43,9 +43,13 @@ export function Profile() {
 
   return (
     <section>
-      <h1 className="mb-8 text-[22px]">Settings</h1>
       {/* User Information */}
       <Container className="max-w-md">
+        <p className="mb-2 text-[15px] text-ink-3">username</p>
+        <p className="text-[17px]">Placeholder</p>
+      </Container>
+
+      <Container className="mt-5 max-w-md">
         <p className="mb-2 text-[15px] text-ink-3">email</p>
         <p className="text-[17px]">{user.email}</p>
       </Container>
@@ -77,23 +81,31 @@ export function Profile() {
           </label>
 
           {error && (
-            <p role="alert" className="text-[15px] text-ink">
+            <p role="alert" className="text-[15px] text-red-400">
               {error}
             </p>
           )}
           {success && (
-            <p className="text-[15px] text-ink-2">password updated</p>
+            <p className="text-[15px] text-green-400">password updated</p>
           )}
 
           <Button
             type="submit"
             disabled={pending}
-            className="disabled:opacity-60"
+            className="w-32 disabled:opacity-60 justify-center hover:bg-gray-200"
           >
             Save
           </Button>
         </form>
       </Container>
+      {/* Placeholder button for now */}
+      <Button
+        type="submit"
+        disabled={pending}
+        className="w-50 mt-5 rounded-2xl border border-red-500 px-7 py-2.5 text-center text-[17px] text-white transition-colors hover:bg-red-600 bg-red-500"
+      >
+        Deactivate Account
+      </Button>
     </section>
   );
 }
