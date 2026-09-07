@@ -13,7 +13,7 @@ const StatCard = ({
   danger?: boolean;
 }) => {
   return (
-    <Container className="sm:col-span-3">
+    <Container className="sm:col-span-3 p-6!">
       <p className="mb-2 text-[15px] text-ink-3">{label}</p>
       <p className={`text-[22px] ${danger ? "text-red-500" : ""}`}>{value}</p>
     </Container>

@@ -19,8 +19,8 @@ export const LineChart = ({ label, data }: LineChartProps) => {
     .join(" ");
 
   return (
-    <Container className="sm:col-span-4">
-      <div className="mb-4 flex items-baseline justify-between gap-6">
+    <Container className="sm:col-span-4 p-6!">
+      <div className="mb-3 flex items-baseline justify-between gap-6">
         <p className="text-[17px]">{label}</p>
         <p className="text-[15px] text-ink-3">{latest}%</p>
       </div>
@@ -28,7 +28,7 @@ export const LineChart = ({ label, data }: LineChartProps) => {
       <svg
         viewBox={`0 0 ${w} ${h}`}
         preserveAspectRatio="none"
-        className="h-24 w-full"
+        className="h-14 w-full"
       >
         <polyline
           points={points}

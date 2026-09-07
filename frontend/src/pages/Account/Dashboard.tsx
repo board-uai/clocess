@@ -27,7 +27,6 @@ export const Dashboard = () => {
 
   return (
     <section>
-      <h1 className="mb-8 text-[22px]">Dashboard</h1>
       <div className="flex flex-col gap-5">
         <DashboardToolbar
           servers={servers}
@@ -44,6 +43,12 @@ export const Dashboard = () => {
         {status === "ready" && (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-12">
             <Statistics stats={stats} />
+            <ConnectedServers servers={servers} />
+            <LineChart label="cpu over time" data={cpuSeries} />
+            <LineChart label="ram over time" data={ramSeries} />
+            <DiskUsageChart servers={servers} />
+            <ActivityLog entries={activity} />
+            <Alerts alerts={alerts} />
           </div>
         )}
       </div>

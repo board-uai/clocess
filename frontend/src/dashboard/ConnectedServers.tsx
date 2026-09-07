@@ -2,12 +2,12 @@ import { Container } from "@/ui/Container";
 import type { ServerStat } from "./useDashboard";
 
 const ROW =
-  "grid grid-cols-[1.2fr_0.6fr_0.6fr_0.8fr_0.6fr_auto] items-center gap-3 border-b border-hair py-3 text-[15px] last:border-0";
+  "grid grid-cols-[1.2fr_0.6fr_0.6fr_0.8fr_0.6fr_auto] items-center gap-3 border-b border-hair py-2 text-[15px] last:border-0";
 const ACTION = "text-ink-3 transition-colors hover:text-ink";
 
 export const ConnectedServers = ({ servers }: { servers: ServerStat[] }) => {
   return (
-    <Container className="sm:col-span-12">
+    <Container className="sm:col-span-12 p-6!">
       <p className="mb-4 text-[17px]">connected servers</p>
 
       <div className={`${ROW} text-ink-3`}>
