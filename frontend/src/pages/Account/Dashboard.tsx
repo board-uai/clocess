@@ -1,4 +1,3 @@
-import { Container } from "@/ui/Container";
 import {
   useDashboard,
   DashboardToolbar,
