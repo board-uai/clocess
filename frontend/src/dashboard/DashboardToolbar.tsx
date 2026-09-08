@@ -27,7 +27,7 @@ export const DashboardToolbar = ({
       <select
         value={serverFilter}
         onChange={(e) => onServerFilterChange(e.target.value)}
-        className="rounded-md border border-line bg-transparent px-3 py-1.5 text-[15px] text-ink"
+        className="rounded-md border border-line bg-transparent px-3 py-1.5 text-[15px] text-ink [color-scheme:dark]"
       >
         <option value="all">server: all</option>
         {servers.map((s) => (

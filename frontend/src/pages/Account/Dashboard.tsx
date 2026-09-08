@@ -14,6 +14,7 @@ export const Dashboard = () => {
   const {
     status,
     servers,
+    allServers,
     activity,
     alerts,
     cpuSeries,
@@ -29,7 +30,7 @@ export const Dashboard = () => {
     <section>
       <div className="flex flex-col gap-5">
         <DashboardToolbar
-          servers={servers}
+          servers={allServers}
           serverFilter={serverFilter}
           onServerFilterChange={setServerFilter}
           range={range}

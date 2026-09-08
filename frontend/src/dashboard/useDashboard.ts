@@ -18,15 +18,20 @@ export interface ActivityEntry {
   id: string;
   time: string;
   message: string;
+  serverId?: string;
 }
 
 export interface AlertEntry {
   id: string;
   message: string;
+  serverId?: string;
 }
 
 export interface TimeSeriesPoint {
-  t: number;
+  /** short relative tick shown under the chart, e.g. "3d" */
+  axisLabel: string;
+  /** exact date shown only in the hover tooltip, e.g. "09/08 14:56" */
+  fullLabel: string;
   value: number;
 }
 
@@ -75,28 +80,78 @@ const MOCK_SERVERS: ServerStat[] = [
 ];
 
 const MOCK_ACTIVITY: ActivityEntry[] = [
-  { id: "1", time: "14:58", message: "upload report.pdf — server1" },
-  { id: "2", time: "14:52", message: "download build.zip — server2" },
-  { id: "3", time: "14:40", message: "server3 disconnected" },
-  { id: "4", time: "14:31", message: "config changed — server1" },
-  { id: "5", time: "14:20", message: "delete old.log — server2" },
+  { id: "1", time: "14:58", message: "upload report.pdf — server1", serverId: "server1" },
+  { id: "2", time: "14:52", message: "download build.zip — server2", serverId: "server2" },
+  { id: "3", time: "14:40", message: "server3 disconnected", serverId: "server3" },
+  { id: "4", time: "14:31", message: "config changed — server1", serverId: "server1" },
+  { id: "5", time: "14:20", message: "delete old.log — server2", serverId: "server2" },
 ];
 
 const MOCK_ALERTS: AlertEntry[] = [
-  { id: "1", message: "server3 status 500" },
-  { id: "2", message: "server4 status 500" },
-  { id: "3", message: "server2 storage 90%" },
+  { id: "1", message: "server3 status 500", serverId: "server3" },
+  { id: "2", message: "server4 status 500", serverId: "server4" },
+  { id: "3", message: "server2 storage 90%", serverId: "server2" },
   { id: "4", message: "device pairing pending" },
 ];
 
-const mockSeries = (seed: number): TimeSeriesPoint[] => {
-  return Array.from({ length: 24 }, (_, i) => ({
-    t: i,
+const RANGE_POINTS: Record<TimeRange, number> = {
+  "1h": 12,
+  "24h": 24,
+  "7d": 7,
+  "30d": 30,
+};
+
+const RANGE_STEP_MS: Record<TimeRange, number> = {
+  "1h": 5 * 60 * 1000,
+  "24h": 60 * 60 * 1000,
+  "7d": 24 * 60 * 60 * 1000,
+  "30d": 24 * 60 * 60 * 1000,
+};
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+// intraday ranges show date + time, e.g. "02/03 14:56"
+const formatDateTime = (d: Date) =>
+  `${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+// multi-day ranges just show the date, e.g. "02/03/2007"
+const formatDate = (d: Date) =>
+  `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`;
+
+const fullLabel = (range: TimeRange, i: number, length: number): string => {
+  const pointsBeforeNow = length - 1 - i;
+  const date = new Date(Date.now() - pointsBeforeNow * RANGE_STEP_MS[range]);
+  return range === "7d" || range === "30d" ? formatDate(date) : formatDateTime(date);
+};
+
+const axisLabel = (range: TimeRange, i: number): string => {
+  switch (range) {
+    case "1h":
+      return `${(i + 1) * 5}m`;
+    case "24h":
+      return `${i + 1}h`;
+    case "7d":
+    case "30d":
+      return `${i + 1}d`;
+  }
+};
+
+const mockSeries = (seed: number, range: TimeRange): TimeSeriesPoint[] => {
+  const length = RANGE_POINTS[range];
+  return Array.from({ length }, (_, i) => ({
+    axisLabel: axisLabel(range, i),
+    fullLabel: fullLabel(range, i, length),
     value: Math.round(
-      40 + 25 * Math.sin(i / 3 + seed) + 10 * Math.sin(i * 1.7 + seed),
+      40 + 25 * Math.sin(i / 3 + seed + length) + 10 * Math.sin(i * 1.7 + seed),
     ),
   }));
 };
+
+const filterByServer = <T extends { serverId?: string }>(
+  items: T[],
+  serverId: string,
+): T[] =>
+  serverId === "all" ? items : items.filter((item) => item.serverId === serverId);
 
 export const useDashboard = () => {
   const [range, setRange] = useState<TimeRange>("24h");
@@ -104,6 +159,7 @@ export const useDashboard = () => {
   const [status, setStatus] = useState<DashboardStatus>("loading");
 
   const [servers, setServers] = useState<ServerStat[]>([]);
+  const [allServers, setAllServers] = useState<ServerStat[]>([]);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [alerts, setAlerts] = useState<AlertEntry[]>([]);
   const [cpuSeries, setCpuSeries] = useState<TimeSeriesPoint[]>([]);
@@ -114,11 +170,20 @@ export const useDashboard = () => {
     let alive = true;
     const id = setTimeout(() => {
       if (!alive) return;
-      setServers(MOCK_SERVERS);
-      setActivity(MOCK_ACTIVITY);
-      setAlerts(MOCK_ALERTS);
-      setCpuSeries(mockSeries(0));
-      setRamSeries(mockSeries(2));
+
+      const visibleServers =
+        serverFilter === "all"
+          ? MOCK_SERVERS
+          : MOCK_SERVERS.filter((s) => s.id === serverFilter);
+
+      const seedOffset = MOCK_SERVERS.findIndex((s) => s.id === serverFilter) + 1;
+
+      setServers(visibleServers);
+      setAllServers(MOCK_SERVERS);
+      setActivity(filterByServer(MOCK_ACTIVITY, serverFilter));
+      setAlerts(filterByServer(MOCK_ALERTS, serverFilter));
+      setCpuSeries(mockSeries(seedOffset, range));
+      setRamSeries(mockSeries(seedOffset + 2, range));
       setStatus("ready");
     }, 200);
     return () => {
@@ -150,6 +215,7 @@ export const useDashboard = () => {
   return {
     status,
     servers,
+    allServers,
     activity,
     alerts,
     cpuSeries,
