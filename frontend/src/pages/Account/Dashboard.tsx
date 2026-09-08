@@ -1,20 +1,57 @@
-import { Container } from '@/ui/Container'
+import {
+  useDashboard,
+  DashboardToolbar,
+  Statistics,
+  ConnectedServers,
+  // ActivityLog,
+  // Alerts,
+  LineChart,
+  DiskUsageChart,
+} from "@/dashboard";
 
-export function Dashboard() {
+export const Dashboard = () => {
+  const {
+    status,
+    servers,
+    allServers,
+    // activity,
+    // alerts,
+    cpuSeries,
+    ramSeries,
+    stats,
+    range,
+    setRange,
+    serverFilter,
+    setServerFilter,
+  } = useDashboard();
+
   return (
     <section>
-      <h1 className="mb-8 text-[22px]">Dashboard</h1>
+      <div className="flex flex-col gap-5">
+        <DashboardToolbar
+          servers={allServers}
+          serverFilter={serverFilter}
+          onServerFilterChange={setServerFilter}
+          range={range}
+          onRangeChange={setRange}
+        />
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-6">
-        <Container className="min-h-40 sm:col-span-6" />
+        {status === "loading" && (
+          <p className="text-[15px] text-ink-3">loading</p>
+        )}
 
-        <Container className="min-h-52 sm:col-span-2" />
-        <Container className="min-h-52 sm:col-span-2" />
-        <Container className="min-h-52 sm:col-span-2" />
-
-        <Container className="min-h-60 sm:col-span-3" />
-        <Container className="min-h-60 sm:col-span-3" />
+        {status === "ready" && (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-12">
+            <Statistics stats={stats} />
+            <ConnectedServers servers={servers} />
+            <LineChart label="cpu over time" series={cpuSeries} />
+            <LineChart label="ram over time" series={ramSeries} />
+            <DiskUsageChart servers={servers} />
+            {/* <ActivityLog entries={activity} /> */}
+            {/* <Alerts alerts={alerts} /> */}
+          </div>
+        )}
       </div>
     </section>
-  )
-}
+  );
+};
