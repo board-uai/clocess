@@ -4,6 +4,7 @@ import { useAuth, useSession } from "@/auth";
 import { useState, type SyntheticEvent } from "react";
 import { changePassword, deactivate } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "@untitledui/icons";
 
 const FIELD =
   "w-full rounded-md border border-ink-3 bg-transparent px-4 py-3 text-[17px] text-ink transition-colors placeholder:text-ink-3 focus:border-ink-2";
@@ -17,6 +18,8 @@ export function Profile() {
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
+  const [newPasswordVisible, setNewPasswordVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [pending, setPending] = useState(false);
@@ -104,26 +107,46 @@ export function Profile() {
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <label className="block">
               <span className={LABEL}>current password</span>
-              <input
-                type="password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-                className={FIELD}
-              />
+              <div className="relative">
+                <input
+                  type={oldPasswordVisible ? "text" : "password"}
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  className={`${FIELD} pr-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setOldPasswordVisible((v) => !v)}
+                  aria-label={oldPasswordVisible ? "hide password" : "show password"}
+                  className="absolute inset-y-0 right-3 flex items-center text-ink-3 transition-colors hover:text-ink"
+                >
+                  {oldPasswordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </label>
             <label className="block">
               <span className={LABEL}>new password</span>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                autoComplete="new-password"
-                required
-                minLength={8}
-                className={FIELD}
-              />
+              <div className="relative">
+                <input
+                  type={newPasswordVisible ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  className={`${FIELD} pr-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setNewPasswordVisible((v) => !v)}
+                  aria-label={newPasswordVisible ? "hide password" : "show password"}
+                  className="absolute inset-y-0 right-3 flex items-center text-ink-3 transition-colors hover:text-ink"
+                >
+                  {newPasswordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
             </label>
 
             {error && (
