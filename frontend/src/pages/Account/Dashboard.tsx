@@ -47,8 +47,8 @@ export const Dashboard = () => {
             <LineChart label="cpu over time" series={cpuSeries} />
             <LineChart label="ram over time" series={ramSeries} />
             <DiskUsageChart servers={servers} />
-            <ActivityLog entries={activity} />
-            <Alerts alerts={alerts} />
+            {/* <ActivityLog entries={activity} /> */}
+            {/* <Alerts alerts={alerts} /> */}
           </div>
         )}
       </div>
