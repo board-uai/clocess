@@ -1,17 +1,190 @@
-import { Container } from '@/ui/Container'
-import { useAuth } from '@/auth'
+import { Container } from "@/ui/Container";
+import { Button } from "@/ui/Button";
+import { useAuth, useSession } from "@/auth";
+import { useState, type SyntheticEvent } from "react";
+import { changePassword, deactivate } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "@untitledui/icons";
+
+const FIELD =
+  "w-full rounded-md border border-ink-3 bg-transparent px-4 py-3 text-[17px] text-ink transition-colors placeholder:text-ink-3 focus:border-ink-2";
+const LABEL = "mb-2 block text-[15px] text-ink-2";
 
 export function Profile() {
-  const { user } = useAuth()
+  const { user } = useAuth();
+
+  const navigate = useNavigate();
+  const { refresh } = useSession();
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [oldPasswordVisible, setOldPasswordVisible] = useState(false);
+  const [newPasswordVisible, setNewPasswordVisible] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [pending, setPending] = useState(false);
+
+  const [deactivating, setDeactivating] = useState(false);
+  const [deactivateError, setDeactivateError] = useState<string | null>(null);
+
+  const handleDeactivate = async () => {
+    if (deactivating) {
+      return;
+    }
+    if (!window.confirm("deactivate your account? this cannot be undone.")) {
+      return;
+    }
+
+    setDeactivateError(null);
+    setDeactivating(true);
+    try {
+      await deactivate();
+      navigate("/", { replace: true });
+      await refresh();
+    } catch (error) {
+      setDeactivateError(
+        error instanceof Error ? error.message : "something went wrong...",
+      );
+    } finally {
+      setDeactivating(false);
+    }
+  };
+
+  const onSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault();
+    if (pending) {
+      return;
+    }
+
+    setError(null);
+    setSuccess(false);
+    setPending(true);
+
+    try {
+      await changePassword(oldPassword, newPassword);
+      setOldPassword("");
+      setNewPassword("");
+      setSuccess(true);
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "something went wrong...",
+      );
+    } finally {
+      setPending(false);
+    }
+  };
 
   return (
     <section>
-      <h1 className="mb-8 text-[22px]">Settings</h1>
+      <div className="flex max-w-md flex-col gap-5">
+        {/* account info — locked fields, same input styling as the form below */}
+        <Container>
+          <div className="flex flex-col gap-4">
+            <label className="block">
+              <span className={LABEL}>username</span>
+              <input
+                type="text"
+                value="Placeholder"
+                disabled
+                className={`${FIELD} cursor-not-allowed bg-hair disabled:opacity-60 text-center`}
+              />
+            </label>
+            <label className="block">
+              <span className={LABEL}>email</span>
+              <input
+                type="email"
+                value={user.email}
+                disabled
+                className={`${FIELD} cursor-not-allowed bg-hair disabled:opacity-60 text-center`}
+              />
+            </label>
+          </div>
+        </Container>
 
-      <Container className="max-w-md">
-        <p className="mb-2 text-[15px] text-ink-3">email</p>
-        <p className="text-[17px]">{user.email}</p>
-      </Container>
+        {/* change password */}
+        <Container>
+          <h2 className="mb-6 text-[17px] text-center">Change password</h2>
+          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+            <label className="block">
+              <span className={LABEL}>current password</span>
+              <div className="relative">
+                <input
+                  type={oldPasswordVisible ? "text" : "password"}
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  className={`${FIELD} pr-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setOldPasswordVisible((v) => !v)}
+                  aria-label={oldPasswordVisible ? "hide password" : "show password"}
+                  className="absolute inset-y-0 right-3 flex items-center text-ink-3 transition-colors hover:text-ink"
+                >
+                  {oldPasswordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </label>
+            <label className="block">
+              <span className={LABEL}>new password</span>
+              <div className="relative">
+                <input
+                  type={newPasswordVisible ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
+                  className={`${FIELD} pr-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setNewPasswordVisible((v) => !v)}
+                  aria-label={newPasswordVisible ? "hide password" : "show password"}
+                  className="absolute inset-y-0 right-3 flex items-center text-ink-3 transition-colors hover:text-ink"
+                >
+                  {newPasswordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </label>
+
+            {error && (
+              <p role="alert" className="text-[15px] text-red-500">
+                {error}
+              </p>
+            )}
+            {success && (
+              <p className="text-[15px] text-ink-2">password updated</p>
+            )}
+            {deactivateError && (
+              <p role="alert" className="text-[15px] text-red-500">
+                {deactivateError}
+              </p>
+            )}
+
+            {/* side by side from sm up; stacked (save on top) on small screens */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button
+                type="submit"
+                disabled={pending}
+                className="w-32 justify-center disabled:opacity-60"
+              >
+                save
+              </Button>
+
+              <button
+                type="button"
+                onClick={handleDeactivate}
+                disabled={deactivating}
+                className="rounded-2xl border border-red-500 px-7 py-2.5 text-center text-[17px] text-red-500 transition-colors hover:bg-red-500 hover:text-white disabled:opacity-60"
+              >
+                {deactivating ? "deactivating..." : "deactivate account"}
+              </button>
+            </div>
+          </form>
+        </Container>
+      </div>
     </section>
-  )
+  );
 }
