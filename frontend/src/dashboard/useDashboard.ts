@@ -35,6 +35,12 @@ export interface TimeSeriesPoint {
   value: number;
 }
 
+export interface ServerSeries {
+  serverId: string;
+  name: string;
+  points: TimeSeriesPoint[];
+}
+
 // Seed data
 const MOCK_SERVERS: ServerStat[] = [
   {
@@ -162,8 +168,8 @@ export const useDashboard = () => {
   const [allServers, setAllServers] = useState<ServerStat[]>([]);
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const [alerts, setAlerts] = useState<AlertEntry[]>([]);
-  const [cpuSeries, setCpuSeries] = useState<TimeSeriesPoint[]>([]);
-  const [ramSeries, setRamSeries] = useState<TimeSeriesPoint[]>([]);
+  const [cpuSeries, setCpuSeries] = useState<ServerSeries[]>([]);
+  const [ramSeries, setRamSeries] = useState<ServerSeries[]>([]);
 
   // Setting up mock data cause there are no API endpoints yet available
   useEffect(() => {
@@ -176,14 +182,25 @@ export const useDashboard = () => {
           ? MOCK_SERVERS
           : MOCK_SERVERS.filter((s) => s.id === serverFilter);
 
-      const seedOffset = MOCK_SERVERS.findIndex((s) => s.id === serverFilter) + 1;
+      // one line per visible server — a distinct seed per server index so
+      // "all servers" overlays genuinely different-looking lines, not copies
+      const cpu = visibleServers.map((s, i) => ({
+        serverId: s.id,
+        name: s.name,
+        points: mockSeries(i + 1, range),
+      }));
+      const ram = visibleServers.map((s, i) => ({
+        serverId: s.id,
+        name: s.name,
+        points: mockSeries(i + 1 + 10, range),
+      }));
 
       setServers(visibleServers);
       setAllServers(MOCK_SERVERS);
       setActivity(filterByServer(MOCK_ACTIVITY, serverFilter));
       setAlerts(filterByServer(MOCK_ALERTS, serverFilter));
-      setCpuSeries(mockSeries(seedOffset, range));
-      setRamSeries(mockSeries(seedOffset + 2, range));
+      setCpuSeries(cpu);
+      setRamSeries(ram);
       setStatus("ready");
     }, 200);
     return () => {

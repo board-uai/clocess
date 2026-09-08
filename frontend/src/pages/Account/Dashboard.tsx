@@ -45,8 +45,8 @@ export const Dashboard = () => {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-12">
             <Statistics stats={stats} />
             <ConnectedServers servers={servers} />
-            <LineChart label="cpu over time" data={cpuSeries} />
-            <LineChart label="ram over time" data={ramSeries} />
+            <LineChart label="cpu over time" series={cpuSeries} />
+            <LineChart label="ram over time" series={ramSeries} />
             <DiskUsageChart servers={servers} />
             <ActivityLog entries={activity} />
             <Alerts alerts={alerts} />

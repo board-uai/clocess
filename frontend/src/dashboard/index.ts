@@ -6,6 +6,7 @@ export type {
   ActivityEntry,
   AlertEntry,
   TimeSeriesPoint,
+  ServerSeries,
 } from "./useDashboard";
 
 export { DashboardToolbar } from "./DashboardToolbar";
