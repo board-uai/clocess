@@ -44,17 +44,18 @@ function App() {
 
   const atAccount = location.pathname.startsWith("/account");
 
+  const atAuth = stage === "auth" || leaving;
   const chrome = (docked || leaving || stage === "auth") && !atAccount;
 
   return (
     <>
-      {/* all three sit outside routes, a route change must not remount them */}
       <Void stage={stage} onDock={() => setDocked(true)} />
       {chrome && (
-        <Navbar atAuth={stage === "auth" || leaving} onLeave={leave} />
+        <>
+          <Navbar atAuth={atAuth} onLeave={leave} />
+          <Hero />
+        </>
       )}
-      {chrome && <Hero />}
-
       <Outlet />
     </>
   );

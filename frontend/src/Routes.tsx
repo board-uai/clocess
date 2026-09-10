@@ -3,7 +3,7 @@ import App from "./App";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Account, Dashboard, Profile } from "./pages/Account";
-import { RequireAuth } from "./auth";
+import { RedirectIfAuthed, RequireAuth } from "./auth/CheckAuth";
 
 export const router = createBrowserRouter([
   {
@@ -11,8 +11,13 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: null },
-      { path: "login", element: <Login /> },
-      { path: "register", element: <Register /> },
+      {
+        element: <RedirectIfAuthed />,
+        children: [
+          { path: "login", element: <Login /> },
+          { path: "register", element: <Register /> },
+        ],
+      },
       {
         element: <RequireAuth />,
         children: [
