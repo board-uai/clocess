@@ -4,11 +4,13 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Account, Dashboard, Profile } from "./pages/Account";
 import { RedirectIfAuthed, RequireAuth } from "./auth/CheckAuth";
+import ErrorPage from "./pages/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: null },
       {
