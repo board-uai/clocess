@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { createScene } from '@/scene'
 import type { SceneHandle, StageName } from '@/scene'
 
@@ -14,7 +14,6 @@ export function Void({ stage, onDock }: VoidProps) {
   const sceneRef = useRef<SceneHandle | null>(null)
   const onDockRef = useRef(onDock)
   const stageRef = useRef(stage)
-  const [launched, setLaunched] = useState(stage !== 'hero')
 
   useEffect(() => {
     onDockRef.current = onDock
@@ -39,10 +38,17 @@ export function Void({ stage, onDock }: VoidProps) {
     const onResize = () => scene.resize()
     const onLaunch = () => {
       scene.launch()
-      setLaunched(true)
     }
 
-    const onScroll = () => scene.setScroll(window.scrollY / window.innerHeight)
+    const onScroll = () => {
+      /* how far the page is through the hero, which is what the scene asks for
+         and what --hero already meant. measured against the viewport rather
+         than the document: the sections below are not the hero, and reading
+         scrollHeight here forced a layout on every scroll event besides */
+      const hero = Math.min(1, Math.max(0, window.scrollY / window.innerHeight))
+      scene.setScroll(hero)
+      document.documentElement.style.setProperty('--hero', String(hero))
+    }
 
     const onVisibility = () => {
       if (!document.hidden) scene.wake()
@@ -106,11 +112,6 @@ export function Void({ stage, onDock }: VoidProps) {
         className="fixed inset-0 z-0 block h-dvh w-full"
       />
 
-      <p
-        className={`pointer-events-none fixed inset-x-0 top-[53svh] z-10 mx-auto px-pad text-center text-[clamp(16px,2vw,20px)] transition-opacity duration-500 ${launched ? 'opacity-0' : 'opacity-100'}`}>
-        Spare room on your server, and an SSH session every time you want to open a holiday picture?
-        <span className="mt-5 block text-ink-3">scroll..</span>
-      </p>
     </>
   )
 }

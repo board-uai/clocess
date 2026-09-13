@@ -1,9 +1,12 @@
 import { useLocation } from 'react-router-dom'
 import { Footer } from '@/layout/Footer'
-import { StorageCanvas } from './sections/StorageCanvas'
-import { FeatureCards } from './sections/FeatureCards'
-import { StoryFolder } from './sections/StoryFolder'
+import { Boxes } from './sections/Boxes'
+import { Everything } from './sections/Everything'
+import { Handshake } from './sections/Handshake'
+import { KeepNone } from './sections/KeepNone'
 import { SAY_Y } from '@/scene'
+
+const GAP = 'h-[clamp(320px,42vh,560px)]'
 
 export function Hero() {
   const atHome = useLocation().pathname === '/'
@@ -17,17 +20,27 @@ export function Hero() {
         A slice of your own server, reachable from your phone
       </p>
 
-      <section className="exit-fade pointer-events-none absolute inset-x-0 top-[52svh] z-10 px-pad">
-        <StorageCanvas />
-      </section>
 
       {atHome && (
         <>
+          <div className="hero-sink pointer-events-none absolute inset-x-0 top-[57svh] z-10 flex justify-center px-pad">
+            <Handshake />
+          </div>
+
           <section className="h-svh" />
+          <div className={GAP} />
+          <KeepNone />
 
-          <StoryFolder />
+          <div className={GAP} />
 
-          <FeatureCards />
+          <Everything />
+
+          <div className={GAP} />
+
+          <Boxes />
+
+
+          <div className={GAP} />
 
           <Footer />
         </>
