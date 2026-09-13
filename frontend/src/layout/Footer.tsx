@@ -2,7 +2,7 @@ import { Button } from '@/ui/Button'
 
 const DESTINATIONS = [
   { label: 'github', href: '#' },
-  { label: 'docs', href: '#' },
+  { label: 'docs', to: '/docs' },
 ]
 
 export function Footer() {

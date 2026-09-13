@@ -4,7 +4,7 @@ import { Button } from '@/ui/Button'
 import { useSession, useSignOut } from '@/auth'
 
 const DESTINATIONS = [
-  { label: 'docs', href: '#' },
+  { label: 'docs', to: '/docs' },
   { label: 'github', href: 'https://github.com/board-uai/clocess', target: '_blank' },
 ]
 
