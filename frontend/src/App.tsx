@@ -20,9 +20,12 @@ function App() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const atAccount = location.pathname.startsWith("/account");
+  // these pages bring their own nav, so the landing chrome stays out
+  const ownLayout = ["/account", "/docs"].some((p) =>
+    location.pathname.startsWith(p),
+  );
   const atAuth = stage === "auth" || leaving;
-  const chrome = (docked || leaving || stage === "auth") && !atAccount;
+  const chrome = (docked || leaving || stage === "auth") && !ownLayout;
 
   return (
     <>
