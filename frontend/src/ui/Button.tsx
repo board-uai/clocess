@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react'
 import { Link } from 'react-router-dom'
 
-export type ButtonVariant = 'solid' | 'quiet' | 'ghost'
+export type ButtonVariant = 'solid' | 'quiet' | 'ghost' | 'dashed'
 
 const BASE = 'inline-flex items-center gap-2 text-[17px] whitespace-nowrap'
 
@@ -11,6 +11,10 @@ const VARIANT: Record<ButtonVariant, string> = {
     'rounded-md bg-fill px-7 py-2 text-on-fill transition-transform motion-safe:hover:-translate-y-px',
   quiet: 'text-ink-3 transition-colors hover:text-ink',
   ghost: 'rounded-md px-7 py-2 text-ink transition-colors hover:bg-fill hover:text-on-fill',
+  /* the unfinished half of a pair: the same geometry as solid, drawn rather
+     than filled, so the two read as one control with one of them offered */
+  dashed:
+    'rounded-md border border-dashed border-ink/70 px-7 py-2 text-ink transition-colors hover:bg-ink/5',
 }
 
 /** to routes in place, href leaves the app, neither one is a button */

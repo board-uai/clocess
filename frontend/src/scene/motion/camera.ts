@@ -1,4 +1,4 @@
-import { FOV } from '../config'
+import { FOV, LATTICE } from '../config'
 import type { Pose } from '../types'
 
 export interface CameraSolution {
@@ -25,6 +25,8 @@ export function solveCamera(pose: Pose, vw: number, vh: number, depth: number): 
     y: ((pose.cy / vh) * 2 - 1) * z * tan,
     z,
     near: Math.max(0.01, z * 0.04),
-    far: z + depth * 1.4 + 1,
+    /* the lattice reaches further back than the letters ever do, and a far
+       plane short of it slices the structure off mid-air */
+    far: z + Math.max(depth * 1.4, -LATTICE.back) + 1,
   }
 }

@@ -263,3 +263,130 @@
     }
   }
 }
+
+@layer components {
+  /* the live marker. the core holds a steady pulse and a ring goes out from
+     under it, which is what reads as a signal rather than a blinking light */
+  .beat {
+    position: relative;
+    display: inline-block;
+    width: 0.34em;
+    height: 0.34em;
+    border-radius: var(--radius-pill);
+    background: var(--beat, currentColor);
+    vertical-align: 0.08em;
+    animation: beat-core 2.4s ease-in-out infinite;
+  }
+
+  .beat::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    animation: beat-ring 2.4s ease-out infinite;
+  }
+
+  @keyframes beat-core {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    55% {
+      opacity: 0.45;
+    }
+  }
+
+  @keyframes beat-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    70%,
+    100% {
+      transform: scale(3.4);
+      opacity: 0;
+    }
+  }
+
+  /* and the tail, running one dot at a time so the line reads as still going */
+  .beat-tick {
+    animation: beat-tick 2.4s ease-in-out infinite;
+  }
+
+  @keyframes beat-tick {
+    0%,
+    55%,
+    100% {
+      opacity: 0.22;
+    }
+    28% {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat,
+    .beat::after,
+    .beat-tick {
+      animation: none;
+    }
+    .beat::after {
+      opacity: 0;
+    }
+  }
+}
+
+/* the hero's own scroll, 0 at the top and 1 one screen down */
+@property --hero {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@layer components {
+  /**
+   * The panel under the wordmark leaves downward. The page is already carrying
+   * it up at 1:1, so this has to outrun that before the net movement is down at
+   * all — at 150svh the sum is 57svh + 50svh x --hero, which only ever grows.
+   * The lens takes the wordmark the other way, so the two part immediately
+   * instead of crossing over each other.
+   */
+  .hero-sink {
+    transform: translate3d(0, calc(var(--hero) * 150svh), 0);
+    opacity: clamp(0, calc(1 - var(--hero) * 1.6), 1);
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* no parallax: it just goes, and sooner, so it still clears the wordmark */
+    .hero-sink {
+      transform: none;
+      opacity: clamp(0, calc(1 - var(--hero) * 3.4), 1);
+    }
+  }
+}
+
+@layer components {
+  /* edit mode: everything you could remove says so by not sitting still. small
+     and quick — a big swing reads as broken rather than as waiting */
+  .wobble {
+    animation: wobble 0.24s ease-in-out infinite alternate;
+  }
+
+  @keyframes wobble {
+    from {
+      transform: rotate(-0.55deg) translate3d(0, -0.5px, 0);
+    }
+    to {
+      transform: rotate(0.55deg) translate3d(0, 0.5px, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wobble {
+      animation: none;
+    }
+  }
+}
+
