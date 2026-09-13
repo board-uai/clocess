@@ -5,7 +5,7 @@ import { useSession, useSignOut } from '@/auth'
 
 const DESTINATIONS = [
   { label: 'docs', href: '#' },
-  { label: 'github', href: '#' },
+  { label: 'github', href: 'https://github.com/board-uai/clocess', target: '_blank' },
 ]
 
 const PILL =
@@ -46,9 +46,9 @@ export function Navbar({ atAuth, onLeave }: NavbarProps) {
     <nav aria-label="Main" className="relative z-20">
       <div className="mx-auto flex h-22 max-w-page items-center justify-between gap-8 px-pad">
         <ul className="flex items-center gap-8 sm:gap-12">
-          {DESTINATIONS.map(({ label, href }) => (
+          {DESTINATIONS.map(({ label, ...link }) => (
             <li key={label}>
-              <Button variant="quiet" href={href}>
+              <Button variant="quiet" {...link}>
                 {label}
               </Button>
             </li>
