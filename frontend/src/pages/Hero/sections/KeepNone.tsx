@@ -27,7 +27,7 @@ export function KeepNone() {
           Your server keeps the files
           {/* the second line steps well in, so the pair reads as one thought
               falling across the page rather than two stacked sentences */}
-          <span className="block pl-[44%]">We keep none of them</span>
+          <span className="block pl-[20%]">We keep none of them</span>
         </h2>
 
         <div className="mt-[clamp(24px,4vh,48px)] text-[clamp(13px,1.45vw,18px)] leading-[1.9] text-ink-2">

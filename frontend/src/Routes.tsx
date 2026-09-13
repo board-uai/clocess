@@ -3,6 +3,7 @@ import App from "./App";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Account, Dashboard, Profile } from "./pages/Account";
+import { Api, Docs, Documentation, Overview } from "./pages/Docs";
 import { RedirectIfAuthed, RequireAuth } from "./auth/CheckAuth";
 import ErrorPage from "./pages/ErrorPage";
 
@@ -13,6 +14,15 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: null },
+      {
+        path: "docs",
+        element: <Docs />,
+        children: [
+          { index: true, element: <Overview /> },
+          { path: "documentation/:slug?", element: <Documentation /> },
+          { path: "api/:slug?", element: <Api /> },
+        ],
+      },
       {
         element: <RedirectIfAuthed />,
         children: [
