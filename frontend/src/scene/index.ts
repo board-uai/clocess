@@ -1,6 +1,7 @@
 export * from './config'
 export * from './createScene'
 export * from './geometry/decode'
+export * from './geometry/lattice'
 export * from './motion/camera'
 export * from './motion/flight'
 export * from './shaders/env'

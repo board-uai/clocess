@@ -15,6 +15,10 @@ export type SceneUniforms = {
   uCam: IUniform<Vector3>
   /** room brightness, 1 = lit, 0 = pure black */
   uRoom: IUniform<number>
+  /** the deep light: xy = its centre in px, z = radius px, w = strength */
+  uGlow: IUniform<Vector4>
+  /** 1 while the hero holds the screen, 0 once it has been scrolled past */
+  uHero: IUniform<number>
   uHalfW: IUniform<number>
   uHalfH: IUniform<number>
   uDepth: IUniform<number>

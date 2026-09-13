@@ -5,6 +5,7 @@ uniform vec3  uEnvBot;
 uniform vec2  uHot;
 uniform vec4  uLogo;   // xy = centre px, z = width px, w = strength
 uniform float uRoom;   // 1 = lit room, 0 = pure black
+uniform vec4  uGlow;   // xy = source centre px, z = radius px, w = strength
 
 vec3 envAt(vec2 fc){
   vec2 uv = fc / uRes;
@@ -14,6 +15,10 @@ vec3 envAt(vec2 fc){
   // one soft overhead source, drifting with the pointer
   float d = distance(vec2(uv.x * (uRes.x / uRes.y), uv.y), uHot);
   c += vec3(0.030) * (1.0 - smoothstep(0.0, 1.05, d));
+
+  // the light sunk into the back of the room, seen through the air
+  float gd = distance(fc, uGlow.xy) / max(uGlow.z, 1.0);
+  c += vec3(uGlow.w) * exp(-gd * gd * 1.8);
 
   // contact shadow, driven by the logo's measured rect
   vec2 rel = (fc - uLogo.xy) / max(uLogo.z, 1.0);

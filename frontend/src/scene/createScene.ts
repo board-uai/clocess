@@ -21,6 +21,8 @@ import {
   ENV_BOT,
   ENV_TOP,
   FOV,
+  GLOW,
+  LATTICE,
   HALF_W,
   STAGE,
   TILT_PITCH,
@@ -29,6 +31,7 @@ import {
 import type { Stage, StageName } from './config'
 import { SKY_FRAG, SKY_VERT } from './shaders/env'
 import { poseOf, stageAt } from './motion/flight'
+import { createLattice } from './geometry/lattice'
 import { loadLogo } from './geometry/decode'
 import { createLogoMaterial } from './shaders/logo'
 import type { SceneUniforms } from './types'
@@ -56,6 +59,9 @@ export interface SceneOptions {
   onExit?: (exit: number) => void
 }
 
+/** half the lens angle, the one number the screen-space maths needs */
+const TAN = Math.tan((FOV * Math.PI) / 360)
+
 export function createScene(
   canvas: HTMLCanvasElement,
   options: SceneOptions = {},
@@ -73,6 +79,8 @@ export function createScene(
     uEnvBot: { value: new Color(ENV_BOT) },
     uHot: { value: new Vector2(0.5, 1) },
     uLogo: { value: new Vector4(0, 0, 1, 0) },
+    uGlow: { value: new Vector4(0, 0, 1, 0) },
+    uHero: { value: 1 },
     uCam: { value: new Vector3() },
     uRoom: { value: 1 },
     uHalfW: { value: HALF_W },
@@ -103,7 +111,19 @@ export function createScene(
   const pivot = new Object3D()
   scene.add(pivot)
 
+  const controller = new AbortController()
+
+  /* the scaffold, built rather than loaded — it stands entirely behind the
+     letters, so it never has to dodge them */
+  const lattice = createLattice(uniforms)
+  pivot.add(lattice.group)
+
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  /* nothing in the scene moves on its own unless one of these says so, and if
+     nothing does the loop is free to settle after the flight rather than
+     redrawing an unchanged frame for the life of the page */
+  const drifts = !reduced && LATTICE.sway > 0
 
   let vw = 0
   let vh = 0
@@ -162,6 +182,23 @@ export function createScene(
       // the shadow is pinned to the docked pose, so it goes as the lens leaves
       shadow * current.room * (1 - exit),
     )
+
+    /* the deep light, measured onto the screen the same way. the lens never
+       rotates, so this is a divide rather than a matrix — and doing it here
+       means it tracks the flight and the scroll without its own bookkeeping */
+    const glowAway = camera.position.z - GLOW.at[2]
+    const glowHalf = glowAway * TAN
+    uniforms.uGlow.value.set(
+      (((GLOW.at[0] - camera.position.x) / (glowHalf * (vw / vh))) * 0.5 + 0.5) * vw * dpr,
+      (((GLOW.at[1] - camera.position.y) / glowHalf) * 0.5 + 0.5) * vh * dpr,
+      (GLOW.halo / glowHalf) * vh * dpr * 0.5,
+      GLOW.haze * (1 - exit * LATTICE.leave),
+    )
+
+    /* how much the structure gives up as the wordmark leaves, on the same
+       clock. at LATTICE.leave = 0 it gives up nothing and stays behind the
+       whole page; uRoom still takes it out on the flight to auth either way */
+    uniforms.uHero.value = 1 - exit * LATTICE.leave
   }
 
   /** always departs from the pose on screen, so a mid air turn never snaps */
@@ -206,10 +243,17 @@ export function createScene(
     queue()
   }
 
-  function frame() {
+  function frame(now: number) {
     raf = null
 
     let moved = false
+
+    /* the scaffold sways for as long as the page is open, so the loop can never
+       settle — unless the reader asked for stillness, and then it never starts */
+    if (drifts) {
+      lattice.sway(now)
+      dirty = true
+    }
 
     if (u < 1) {
       u = Math.min(1, (performance.now() - t0) / dur)
@@ -243,6 +287,7 @@ export function createScene(
     }
   }
 
+
   function launch() {
     if (launched) return
     flyTo('hero')
@@ -261,7 +306,6 @@ export function createScene(
     wake()
   }
 
-  const controller = new AbortController()
   let logo: Mesh | null = null
   let logoMaterial: ShaderMaterial | null = null
 
@@ -285,6 +329,7 @@ export function createScene(
     if (raf !== null) cancelAnimationFrame(raf)
     logo?.geometry.dispose()
     logoMaterial?.dispose()
+    lattice.dispose()
     skyGeometry.dispose()
     skyMaterial.dispose()
     renderer.dispose()
