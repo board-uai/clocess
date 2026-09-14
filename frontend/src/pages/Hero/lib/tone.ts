@@ -49,8 +49,6 @@ export const ACCENT = {
 export const ROUND = {
   screen: 'rounded-[clamp(3px,0.5vw,7px)]',
   chip: 'rounded-[clamp(5px,0.75vw,10px)]',
-  fileTop: 'rounded-t-[clamp(4px,0.65vw,9px)]',
-  fileBase: 'rounded-b-[clamp(4px,0.65vw,9px)]',
 } as const
 
 /**

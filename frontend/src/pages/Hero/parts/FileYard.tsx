@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent, KeyboardEvent } from 'react'
+import { FileIcon } from '@/files'
 import { ROUND, TONE, TYPE } from '../lib/tone'
 import { THROW_CSS, useVanish } from '../lib/motion'
 import { useYard } from '../lib/useYard'
@@ -140,7 +141,6 @@ export function FileYard() {
           const up = held === file.id
           const on = picked.has(file.id)
           const gone = leaving.has(file.id)
-          const face = up || on ? TONE.bright : TONE.face
 
           return (
             <li
@@ -176,19 +176,16 @@ export function FileYard() {
                 className={`relative block w-[var(--w)] text-center transition-[transform,filter] duration-150
                             ${up ? 'cursor-grabbing' : 'cursor-grab'} focus-visible:outline-offset-[6px]`}
               >
-                {/* the selection sits behind the whole file, label and all — a
-                    lit face is already so bright that brightening it further is
-                    not a difference anyone can see */}
+                {/* the selection sits behind the whole file, label and all — the
+                    outline is already white, so the ground behind it is the
+                    only thing left to light */}
                 <span
                   aria-hidden="true"
                   style={{ background: on ? TONE.deep : 'transparent' }}
                   className="pointer-events-none absolute -inset-x-[10%] -inset-y-[6%] rounded-[var(--r)] transition-colors duration-150"
                 />
 
-                <span
-                  style={{ background: face, borderRadius: 'var(--r)' }}
-                  className="relative block aspect-[70/45] transition-colors duration-150"
-                />
+                <FileIcon name={file.name} className="relative block h-auto w-full" />
 
                 <span
                   style={{ color: on || up ? TONE.bright : TONE.face }}
