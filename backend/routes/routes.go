@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/board-uai/clocess/routes/auth"
 	"github.com/board-uai/clocess/routes/files"
+	"github.com/board-uai/clocess/routes/remotes"
 	"github.com/board-uai/clocess/routes/settings"
 	"github.com/board-uai/clocess/storage"
 	"github.com/labstack/echo/v5"
@@ -46,7 +47,6 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 			r.PATCH("/change_password", func(c *echo.Context) error {
 				return settings.ChangeUserPassword(c, logger, redis)
 			})
-
 		})
 	})
 
@@ -66,6 +66,17 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 
 		r.GET("/download", func(c *echo.Context) error {
 			return files.DownloadUserFile(c, logger, redis, storage)
+		})
+	})
+
+	// remote/[endpoint]
+	Group(api, "/remote", func(r *echo.Group) {
+		r.GET("/get_key", func(c *echo.Context) error {
+			return remotes.GetPublicKey(c, logger, redis)
+		})
+
+		r.POST("/add_remote", func(c *echo.Context) error {
+			return remotes.AddUserRemote(c, logger, redis)
 		})
 	})
 }
