@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { me } from '@/lib/api'
+import { SESSION_LOST, me } from '@/lib/api'
 import type { User } from '@/lib/api'
-import { SessionCtx } from './session'
+import { SessionCtx, rememberEmail } from './session'
 import type { SessionStatus } from './session'
 
 /** one ask at startup, every page reads the answer from here */
@@ -38,6 +38,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       alive = false
     }
+  }, [])
+
+  useEffect(() => {
+    if (user) rememberEmail(user.email)
+  }, [user])
+
+  // any 401 mid-use means the cookie is gone, the guard takes it from here
+  useEffect(() => {
+    function lost() {
+      setUser(null)
+      setStatus('out')
+    }
+    window.addEventListener(SESSION_LOST, lost)
+    return () => window.removeEventListener(SESSION_LOST, lost)
   }, [])
 
   const value = useMemo(() => ({ user, status, refresh }), [user, status, refresh])

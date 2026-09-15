@@ -15,6 +15,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// dummyHash keeps a login for an unknown email as slow as one with a wrong password
+var dummyHash, _ = bcrypt.GenerateFromPassword([]byte("timing-equaliser"), bcrypt.DefaultCost)
+
 // RegisterUser godoc
 // @Summary      Register a new user
 // @Description  Creates a user account and starts a session
@@ -23,19 +26,16 @@ import (
 // @Produce      json
 // @Param        body  body      userAuthDTO true  "email + password (min 8 chars)"
 // @Success      201   {object}  map[string]any
-// @Failure      400   {object}  map[string]string  "invalid body / invalid email / password too short"
+// @Failure      400   {object}  map[string]string  "invalid body / invalid email / password too short / too long"
 // @Failure      409   {object}  map[string]string  "email already registered"
 // @Failure      500   {object}  map[string]string
 // @Router       /user/create [post]
 func RegisterUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
-	var userData userAuthDTO
-	if err := c.Bind(&userData); err != nil {
-		logger.Err(err).Msg("failed to bind user registry data")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")
+	userData, err := bindUserAuth(c)
+	if err != nil {
+		return err
 	}
-
-	if err := userData.ValidateUserAuthInfo(logger); err != nil {
-		logger.Err(err).Msg("fail in validating user auth data")
+	if err := userData.ValidateRegister(); err != nil {
 		return err
 	}
 
@@ -53,12 +53,12 @@ func RegisterUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) 
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return echo.NewHTTPError(http.StatusConflict, "email already registred")
+			return echo.NewHTTPError(http.StatusConflict, "email already registered")
 		}
 		logger.Err(err).Msg("failed to create user")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to create user")
 	}
-	logger.Info().Str("user", userData.Email).Msg("user was successfully created")
+	logger.Info().Int32("userID", id).Msg("user was successfully created")
 
 	if err := cache.CreateSession(c, redis, id, logger); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to create session")
@@ -69,7 +69,7 @@ func RegisterUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) 
 
 // LoginUser godoc
 // @Summary      Log in
-// @Description  Verifies credentials, activates the account if inactive, and starts a new session
+// @Description  Verifies credentials and starts a new session, a deactivated account is refused
 // @Tags         auth
 // @Accept       json
 // @Produce      json
@@ -77,17 +77,15 @@ func RegisterUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) 
 // @Success      200   {object}  map[string]any
 // @Failure      400   {object}  map[string]string
 // @Failure      401   {object}  map[string]string  "invalid credentials"
+// @Failure      403   {object}  map[string]string  "this account is deactivated"
 // @Failure      500   {object}  map[string]string
 // @Router       /user/login [post]
 func LoginUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
-	var userData userAuthDTO
-	if err := c.Bind(&userData); err != nil {
-		logger.Err(err).Msg("failed to bind user registry data")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid body")
+	userData, err := bindUserAuth(c)
+	if err != nil {
+		return err
 	}
-
-	if err := userData.ValidateUserAuthInfo(logger); err != nil {
-		logger.Err(err).Msg("fail in validating user auth data")
+	if err := userData.ValidateLogin(); err != nil {
 		return err
 	}
 
@@ -95,25 +93,22 @@ func LoginUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) err
 	user, err := queries.GetUserByEmail(c.Request().Context(), userData.Email)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			logger.Err(err).Msg("found no user")
+			_ = bcrypt.CompareHashAndPassword(dummyHash, []byte(userData.Password))
 			return echo.NewHTTPError(http.StatusUnauthorized, "invalid credentials")
 		}
+		logger.Err(err).Msg("failed to find user")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to find user")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(userData.Password)); err != nil {
-		logger.Err(err).Str("email", userData.Email).Msg("failed login atempt")
+		logger.Info().Int32("userID", user.ID).Msg("failed login attempt")
 		return echo.NewHTTPError(http.StatusUnauthorized, "invalid credentials")
 	}
 
-	logger.Info().Str("user", userData.Email).Msg("user logged in")
-
 	if !user.Active {
-		if err := queries.ActivateUser(c.Request().Context(), user.ID); err != nil {
-			logger.Err(err).Int32("userID", user.ID).Msg("failed to change user status to active")
-			return echo.NewHTTPError(http.StatusInternalServerError, "failed to change user status to active")
-		}
+		return echo.NewHTTPError(http.StatusForbidden, "this account is deactivated")
 	}
+	logger.Info().Int32("userID", user.ID).Msg("user logged in")
 
 	ctx := c.Request().Context()
 	if cookie, err := c.Cookie("session_id"); err == nil {

@@ -39,6 +39,8 @@ func main() {
 	}
 
 	e := echo.New()
+	// the frontend proxy forwards the client ip, without this every visitor shares the proxy's rate limit
+	e.IPExtractor = echo.ExtractIPFromXFFHeader()
 
 	api := e.Group("/api")
 	routes.SetupRoutes(api, &utils.ApiLogger, &redisStruct.Client, storageStruct)

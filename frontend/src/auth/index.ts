@@ -1,8 +1,9 @@
 export { AuthProvider } from "./AuthProvider";
-export { AuthForm } from "./AuthForm";
+export { AuthFooter, AuthPage, Field, FormError, Status } from "./AuthForm";
+export { useAuthSubmit } from "./useAuthSubmit";
 export { RequireAuth, RedirectIfAuthed } from "./CheckAuth";
 export { useAuth } from "./useAuth";
-export { useSession } from "./session";
+export { forgetEmail, rememberedEmail, useSession } from "./session";
 export { useSignOut } from "./useSignOut";
 export type { Session, SessionStatus } from "./session";
 

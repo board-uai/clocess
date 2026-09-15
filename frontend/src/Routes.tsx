@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { SignedOut } from "./pages/SignedOut";
 import { Account, Dashboard, Profile } from "./pages/Account";
 import { Api, Docs, Documentation, Overview } from "./pages/Docs";
 import { RedirectIfAuthed, RequireAuth } from "./auth/CheckAuth";
@@ -28,6 +30,8 @@ export const router = createBrowserRouter([
         children: [
           { path: "login", element: <Login /> },
           { path: "register", element: <Register /> },
+          { path: "forgot-password", element: <ForgotPassword /> },
+          { path: "signed-out", element: <SignedOut /> },
         ],
       },
       {
