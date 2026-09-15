@@ -37,10 +37,11 @@ func DeactivateUser(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to change status of user")
 	}
 
-	if err := cache.DeleteSession(c, redis, logger); err != nil {
-		logger.Err(err).Int32("userID", userID).Msg("failed to delete user session")
+	if err := cache.DeleteUserSessions(ctx, redis, userID); err != nil {
+		logger.Err(err).Int32("userID", userID).Msg("failed to delete user sessions")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete user session")
 	}
+	cache.ClearSessionCookie(c)
 	logger.Info().Int32("userID", userID).Msg("user was deactivated")
 
 	return c.NoContent(http.StatusOK)

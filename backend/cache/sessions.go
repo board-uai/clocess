@@ -22,7 +22,13 @@ func CreateSession(c *echo.Context, redis *redis.Client, userID int32, logger *z
 		return err
 	}
 	ctx := c.Request().Context()
-	if err = redis.Set(ctx, "session:"+sessionID, userID, 24*time.Hour).Err(); err != nil {
+	// the per-user index is what lets a password change or deactivation end every session
+	userKey := userSessionsKey(userID)
+	pipe := redis.TxPipeline()
+	pipe.Set(ctx, "session:"+sessionID, userID, 24*time.Hour)
+	pipe.SAdd(ctx, userKey, sessionID)
+	pipe.Expire(ctx, userKey, 24*time.Hour)
+	if _, err = pipe.Exec(ctx); err != nil {
 		logger.Err(err).Msg("failed to store user session")
 		return err
 	}
@@ -52,6 +58,30 @@ func DeleteSession(c *echo.Context, redis *redis.Client, logger *zerolog.Logger)
 		logger.Err(err).Str("session", "session:"+cookie.Value).Msg("failed to delete session")
 		return err
 	}
+	ClearSessionCookie(c)
+	logger.Info().Str("session", "session:"+cookie.Value).Msg("session was deleted")
+	return nil
+}
+
+// DeleteUserSessions ends every session of the user, the index may still hold ids that already expired
+func DeleteUserSessions(ctx context.Context, redis *redis.Client, userID int32) error {
+	userKey := userSessionsKey(userID)
+	sessionIDs, err := redis.SMembers(ctx, userKey).Result()
+	if err != nil {
+		return err
+	}
+	keys := []string{userKey}
+	for _, id := range sessionIDs {
+		keys = append(keys, "session:"+id)
+	}
+	return redis.Del(ctx, keys...).Err()
+}
+
+func userSessionsKey(userID int32) string {
+	return "user_sessions:" + strconv.Itoa(int(userID))
+}
+
+func ClearSessionCookie(c *echo.Context) {
 	c.SetCookie(&http.Cookie{
 		Name:     "session_id",
 		Value:    "",
@@ -61,8 +91,6 @@ func DeleteSession(c *echo.Context, redis *redis.Client, logger *zerolog.Logger)
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
 	})
-	logger.Info().Str("session", "session:"+cookie.Value).Msg("session was deleted")
-	return nil
 }
 
 func DeleteSessionByID(ctx context.Context, redis *redis.Client, sessionID string) error {
@@ -88,12 +116,4 @@ func GetUserIDFromSession(c *echo.Context, ctx context.Context, rdb *redis.Clien
 		return 0, err
 	}
 	return int32(parsedUserID), nil
-}
-
-func GetUserSession(c *echo.Context, ctx context.Context, rdb *redis.Client, logger *zerolog.Logger) (sessionID string, err error) {
-	sessionIDRaw, err := c.Cookie("session_id")
-	if err != nil {
-		return "", ErrSessionNotFound
-	}
-	return sessionIDRaw.Value, nil
 }

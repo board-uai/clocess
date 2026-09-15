@@ -16,5 +16,9 @@ func (c changeUserPasswordDTO) ValidateUserPassword(logger *zerolog.Logger) erro
 	if len(c.NewPassword) < 8 {
 		return echo.NewHTTPError(http.StatusBadRequest, "password should be min 8 characters")
 	}
+	// bcrypt refuses anything longer
+	if len(c.NewPassword) > 72 {
+		return echo.NewHTTPError(http.StatusBadRequest, "password is too long")
+	}
 	return nil
 }
