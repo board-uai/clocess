@@ -1,6 +1,6 @@
 import { Container } from "@/ui/Container";
 import { Button } from "@/ui/Button";
-import { useAuth, useSession } from "@/auth";
+import { forgetEmail, useAuth, useSession } from "@/auth";
 import { useState, type SyntheticEvent } from "react";
 import { changePassword, deactivate } from "@/lib/api";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +39,7 @@ export function Profile() {
     setDeactivating(true);
     try {
       await deactivate();
+      forgetEmail();
       navigate("/", { replace: true });
       await refresh();
     } catch (error) {

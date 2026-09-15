@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useSession } from "./session";
+import { rememberedEmail, useSession } from "./session";
 
 export function RequireAuth() {
   const location = useLocation();
@@ -10,7 +10,8 @@ export function RequireAuth() {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    const to = rememberedEmail() ? "/signed-out" : "/login";
+    return <Navigate to={to} replace state={{ from: location.pathname }} />;
   }
 
   return <Outlet />;

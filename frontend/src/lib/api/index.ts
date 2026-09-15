@@ -1,3 +1,5 @@
+export { ApiError, SESSION_LOST } from './client'
+
 export { me, login, register, logout } from './auth'
 export type { User, Credentials, AuthResult } from './auth'
 

@@ -17,8 +17,8 @@ import tailwindcss from '@tailwindcss/vite'
       server: {
         host: true,
         proxy: {
-          '/api': { target: env.VITE_BACKEND_URL,
-  changeOrigin: true },
+          // xfwd passes the client ip on, the backend rate limits by it
+          '/api': { target: env.VITE_BACKEND_URL, changeOrigin: true, xfwd: true },
         },
       },
     }
