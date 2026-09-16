@@ -58,3 +58,5 @@ beszel_socket/
 # dozzle docker continer log system
 dozzle_data/users.yaml
 dozzle_data/*/
+
+secrets/*
