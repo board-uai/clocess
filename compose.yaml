@@ -43,6 +43,14 @@ services:
     depends_on:
       - backend
 
+  landing:
+    container_name: clocess_landing
+    build:
+      context: ./landing
+    volumes:
+      - ./landing:/landing
+      - /landing/node_modules
+
   beszel:
     image: henrygd/beszel:latest
     container_name: beszel
