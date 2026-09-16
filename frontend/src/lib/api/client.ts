@@ -1,5 +1,18 @@
 const BASE = '/api'
 
+/** fired on any 401, the session provider listens so a dead cookie signs the tab out */
+export const SESSION_LOST = 'session:lost'
+
+/** the status travels with the message, the auth forms place the error by it */
+export class ApiError extends Error {
+  status: number
+
+  constructor(message: string, status: number) {
+    super(message)
+    this.status = status
+  }
+}
+
 /** echo reports a failure as { "message": ... } */
 function messageOf(payload: unknown): string | null {
   if (payload && typeof payload === 'object' && 'message' in payload) {
@@ -23,7 +36,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(BASE + path, { ...init, credentials: 'include' })
 
   const payload = parse(await res.text())
-  if (!res.ok) throw new Error(messageOf(payload) ?? `request failed (${res.status})`)
+  if (res.status === 401) window.dispatchEvent(new Event(SESSION_LOST))
+  if (!res.ok) throw new ApiError(messageOf(payload) ?? `request failed (${res.status})`, res.status)
 
   return payload as T
 }

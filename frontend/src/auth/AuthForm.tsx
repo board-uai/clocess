@@ -1,118 +1,114 @@
-import { useState } from 'react'
-import type { FormEvent, ReactNode } from 'react'
-import { Button } from '@/ui/Button'
-import type { Credentials } from '@/lib/api'
+import { useId, useState } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
+import { Eye, EyeOff } from '@untitledui/icons'
 
-interface AuthFormProps {
-  /** sits above the fields */
+interface AuthPageProps {
+  /** the small line above the title: a state, or a note about the page */
+  status?: ReactNode
   title: string
-  /** label on the submit button */
-  action: string
-  /** current-password when signing in, new-password when registering */
-  autoComplete: 'current-password' | 'new-password'
-  /** adds the repeat field, the server has no idea about it so it is checked here */
-  confirm?: boolean
-  /** does the request, rejects with a message worth showing */
-  onSubmit: (credentials: Credentials) => Promise<void>
-  /** the way over to the other auth page */
-  footer: ReactNode
+  lead: ReactNode
+  children: ReactNode
 }
 
-const FIELD =
-    'w-full rounded-md border border-ink-3 bg-transparent px-4 py-3 text-[17px] text-ink transition-colors placeholder:text-ink-3 focus:border-ink-2'
+/** the frame every auth page shares, left aligned under the navbar */
+export function AuthPage({ status, title, lead, children }: AuthPageProps) {
+  return (
+    <div className="auth-in relative z-10 flex min-h-svh justify-center px-pad pt-[16svh] pb-16">
+      <div className="w-full max-w-100">
+        {status && <div className="mb-4">{status}</div>}
+        <h1 className="text-[44px] leading-[1.1] font-light tracking-[-0.02em] text-ink">{title}</h1>
+        <p className="mt-3 mb-8 text-[15px] text-ink-2">{lead}</p>
+        {children}
+      </div>
+    </div>
+  )
+}
 
-const LABEL = 'mb-2 block text-[15px] text-ink-2 border-width: 10px'
+const TONE = {
+  ok: 'text-lime-600 dark:text-lime-300',
+  bad: 'text-red-500',
+}
 
-export function AuthForm({
-  title,
-  action,
-  autoComplete,
-  confirm = false,
-  onSubmit,
-  footer,
-}: AuthFormProps) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [repeat, setRepeat] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [pending, setPending] = useState(false)
+/** a pulsing dot and a word, the page's state before its title */
+export function Status({ tone, children }: { tone: keyof typeof TONE; children: ReactNode }) {
+  return (
+    <p className={`flex items-center gap-2.5 font-mono text-[13px] ${TONE[tone]}`}>
+      <span className="beat" />
+      {children}
+    </p>
+  )
+}
 
-  async function submit(event: FormEvent) {
-    event.preventDefault()
-    if (pending) return
+interface FieldProps extends Omit<ComponentProps<'input'>, 'className' | 'id'> {
+  label: string
+  /** sits on the label's line, at the far end */
+  aside?: ReactNode
+  /** a quiet line under the input, an error takes its place */
+  hint?: ReactNode
+  error?: ReactNode
+}
 
-    if (confirm && password !== repeat) {
-      setError('the passwords do not match')
-      return
-    }
-
-    setError(null)
-    setPending(true)
-    try {
-      await onSubmit({ email, password })
-    } catch (err) {
-      // everything else is the server's call, it validates both fields already
-      setError(err instanceof Error ? err.message : 'something went wrong')
-    } finally {
-      setPending(false)
-    }
-  }
+export function Field({ label, aside, hint, error, type, ...input }: FieldProps) {
+  const id = useId()
+  const [shown, setShown] = useState(false)
+  const secret = type === 'password'
+  const note = error ?? hint
 
   return (
-    <form onSubmit={submit} className="w-full max-w-100">
-      <h1 className="mb-8 text-center text-[22px] text-ink">{title}</h1>
-
-      <div className="flex flex-col gap-4">
-        <label className="block">
-          <span className={LABEL}>email</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-            className={FIELD}
-          />
+    <div>
+      <div className="mb-2 flex items-baseline justify-between gap-4">
+        <label htmlFor={id} className="font-mono text-[13px] text-ink">
+          {label}
         </label>
+        {aside}
+      </div>
 
-        <label className="block">
-          <span className={LABEL}>password</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={autoComplete}
-            required
-            className={FIELD}
-          />
-        </label>
-
-        {confirm && (
-          <label className="block">
-            <span className={LABEL}>repeat password</span>
-            <input
-              type="password"
-              value={repeat}
-              onChange={(e) => setRepeat(e.target.value)}
-              autoComplete="new-password"
-              required
-              className={FIELD}
-            />
-          </label>
+      <div className="relative">
+        <input
+          {...input}
+          id={id}
+          type={secret && shown ? 'text' : type}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={note ? `${id}-note` : undefined}
+          className={`w-full rounded-lg border bg-raise px-4 py-3.5 font-mono text-[15px] text-ink transition-colors placeholder:text-ink-3 ${
+            secret ? 'pr-11' : ''
+          } ${error ? 'border-red-500/70' : 'border-line focus:border-ink-3'}`}
+        />
+        {secret && (
+          <button
+            type="button"
+            onClick={() => setShown((s) => !s)}
+            aria-pressed={shown}
+            aria-label={shown ? 'hide password' : 'show password'}
+            className="absolute inset-y-0 right-3 flex items-center text-ink-3 transition-colors hover:text-ink"
+          >
+            {shown ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
         )}
       </div>
 
-      {error && (
-        <p role="alert" className="mt-4 text-[15px] text-ink">
-          {error}
+      {note && (
+        <p
+          id={`${id}-note`}
+          role={error ? 'alert' : undefined}
+          className={`mt-2 font-mono ${error ? 'text-[13px] text-red-500' : 'text-[12px] text-ink-3'}`}
+        >
+          {note}
         </p>
       )}
-
-      <Button type="submit" disabled={pending} className="mt-6 w-full justify-center disabled:opacity-60">
-        {action}
-      </Button>
-
-      <p className="mt-6 text-center text-[15px] text-ink-3">{footer}</p>
-    </form>
+    </div>
   )
+}
+
+/** a failure no single field owns, above the form so the values stay put */
+export function FormError({ children }: { children: ReactNode }) {
+  return (
+    <p role="alert" className="mb-6 rounded-lg border border-red-500/40 px-4 py-3 font-mono text-[13px] text-red-500">
+      {children}
+    </p>
+  )
+}
+
+export function AuthFooter({ children }: { children: ReactNode }) {
+  return <p className="mt-6 text-center text-[15px] text-ink-3">{children}</p>
 }
