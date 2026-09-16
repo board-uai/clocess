@@ -1,14 +1,11 @@
 package routes
 
 import (
-	"time"
-
 	"github.com/board-uai/clocess/routes/auth"
 	"github.com/board-uai/clocess/routes/files"
 	"github.com/board-uai/clocess/routes/settings"
 	"github.com/board-uai/clocess/storage"
 	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -22,20 +19,15 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 
 	api.GET("/swagger/*", echo.WrapHandler(httpSwagger.WrapHandler))
 
-	// one bucket per ip for both, every attempt costs a bcrypt: 10 at once, then one every 6 s
-	authLimit := middleware.RateLimiter(middleware.NewRateLimiterMemoryStoreWithConfig(
-		middleware.RateLimiterMemoryStoreConfig{Rate: 1.0 / 6, Burst: 10, ExpiresIn: 10 * time.Minute},
-	))
-
 	// /user/[endpoint]
 	Group(api, "/user", func(r *echo.Group) {
 		r.POST("/create", func(c *echo.Context) error {
 			return auth.RegisterUser(c, logger, redis)
-		}, authLimit)
+		})
 
 		r.POST("/login", func(c *echo.Context) error {
 			return auth.LoginUser(c, logger, redis)
-		}, authLimit)
+		})
 
 		r.POST("/logout", func(c *echo.Context) error {
 			return auth.LogoutUser(c, logger, redis)
