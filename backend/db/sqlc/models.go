@@ -30,6 +30,13 @@ type Remote struct {
 	CreatedAt          pgtype.Timestamptz `json:"created_at"`
 }
 
+type RemoteSecret struct {
+	ID                  int32       `json:"id"`
+	RemoteID            pgtype.Int4 `json:"remote_id"`
+	EncryptedPrivateKey []byte      `json:"encrypted_private_key"`
+	KeyVersion          int16       `json:"key_version"`
+}
+
 type User struct {
 	ID           int32              `json:"id"`
 	Email        string             `json:"email"`

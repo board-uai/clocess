@@ -47,7 +47,7 @@ func main() {
 	e := echo.New()
 
 	api := e.Group("/api")
-	routes.SetupRoutes(api, &utils.ApiLogger, &redisStruct.Client, storageStruct)
+	routes.SetupRoutes(api, &utils.ApiLogger, &redisStruct.Client, storageStruct, masterKey)
 
 	err = e.Start(":8080")
 	if err != nil {
