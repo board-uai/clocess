@@ -31,7 +31,7 @@ services:
     depends_on:
       - postgres
     secrets:
-      - remote_secret_key
+      - remote_master_key
     environment:
       REMOTE_MASTER_KEY_FILE: /run/secrets/remote_master_key
 
@@ -85,5 +85,5 @@ volumes:
   redis-data:
 
 secrets:
-  remote_secret_key:
+  remote_master_key:
     file: ./secrets/remote_master.key
