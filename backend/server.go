@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 
 	"github.com/labstack/echo/v5"
 
@@ -20,6 +21,11 @@ import (
 
 func main() {
 	env := utils.NewEnv(&utils.AppLogger, ".env")
+	masterKeyB64 := env.Get("REMOTE_MASTER_KEY")
+	masterKey, err := base64.StdEncoding.DecodeString(masterKeyB64)
+	if err != nil || len(masterKey) != 32 {
+		utils.AppLogger.Fatal().Msg("invalid REMOTE_MASTER_KEY")
+	}
 
 	if err := db.Connect(context.Background(), env, &utils.DBLogger); err != nil {
 		utils.AppLogger.Err(err).Msg("failed to connect to db")
@@ -41,9 +47,9 @@ func main() {
 	e := echo.New()
 
 	api := e.Group("/api")
-	routes.SetupRoutes(api, &utils.ApiLogger, &redisStruct.Client, storageStruct)
+	routes.SetupRoutes(api, &utils.ApiLogger, &redisStruct.Client, storageStruct, masterKey)
 
-	err := e.Start(":8080")
+	err = e.Start(":8080")
 	if err != nil {
 		utils.AppLogger.Fatal().Err(err).Msg("failed to start backend")
 	}

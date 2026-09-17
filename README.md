@@ -12,6 +12,8 @@ functionality will also be done.
 Copy the example env and compose override files, then fill in your values:
 
 ```bash
+mkdir -p secrets
+openssl rand -base64 32 > secrets/remote_master.key
 cp .env.example .env
 cp frontend/.env.example frontend/.env
 cp compose.override.example.yaml compose.override.yaml
@@ -19,6 +21,7 @@ cp compose.override.example.yaml compose.override.yaml
 
 - `.env`
 - `compose.override.yaml` — sets the host/container port mapping and restart policy for local dev.
+ - `secrets/remote_master.key` - master key for accessing db table with private ssh keys
 
 Then start the stack:
 
