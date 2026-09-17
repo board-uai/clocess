@@ -1,7 +1,11 @@
 BASE_URL ?= http://127.0.0.1:8080/api
 COOKIE_JAR ?= cookies.txt
+REDIS_CONTAINER ?= clocess_redis
+ENV_FILE ?= ../../../.env
+REDIS_PASSWORD ?= $(shell grep -E '^REDIS_PASSWORD=' $(ENV_FILE) 2>/dev/null | cut -d '=' -f2-)
+SESSION_ID = $(shell awk -F'\t' '$$6=="session_id"{print $$7}' $(COOKIE_JAR) 2>/dev/null)
 
-.PHONY: ping register login logout deactivate list upload delete download
+.PHONY: ping register login logout deactivate list upload delete download get-key redis-check
 
 ping:
 	curl -s $(BASE_URL)/health/ping -w "\nHTTP %{http_code}\n"
@@ -57,4 +61,8 @@ delete:
 download:
 	curl -s -b $(COOKIE_JAR) "$(BASE_URL)/file/download?file_id=$(FILE_ID)" \
 		-o $(OUT) \
+		-w "\nHTTP %{http_code}\n"
+
+get-key:
+	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/get_key \
 		-w "\nHTTP %{http_code}\n"

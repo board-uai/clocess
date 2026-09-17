@@ -12,7 +12,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, storage *storage.Storage) {
+func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, storage *storage.Storage, masterKey []byte) {
 	// /health/[endpoint]
 	Group(api, "/health", func(r *echo.Group) {
 		r.GET("/ping", Ping)
@@ -72,7 +72,7 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 	// remote/[endpoint]
 	Group(api, "/remote", func(r *echo.Group) {
 		r.GET("/get_key", func(c *echo.Context) error {
-			return remotes.GetPublicKey(c, logger, redis)
+			return remotes.GetPublicKey(c, logger, redis, masterKey)
 		})
 
 		r.POST("/add_remote", func(c *echo.Context) error {

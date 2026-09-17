@@ -2,9 +2,11 @@ package remotes
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/board-uai/clocess/cache"
 	"github.com/board-uai/clocess/routes/remotes/utils"
+	crypt "github.com/board-uai/clocess/utils"
 
 	"github.com/labstack/echo/v5"
 	"github.com/redis/go-redis/v9"
@@ -19,37 +21,30 @@ import (
 // @Failure      401  {object}  map[string]string  "invalid session"
 // @Failure      500  {object}  map[string]string
 // @Router       /remote/get_key [get]
-func GetPublicKey(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
-	var remoteContext AddRemoteDTO
+func GetPublicKey(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, masterKey []byte) error {
 	ctx := c.Request().Context()
-
-	// user id
-	// BUG: userID discarded (_) — need it below to key the pending-key
-	// storage (Redis, TTL) so add_remote can find the matching private key
-	// this same user just got a public key for.
-	_, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
-	if err != nil {
+	if _, err := cache.GetUserIDFromSession(c, ctx, redis, logger); err != nil {
 		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
 	}
-	// DEAD CODE: this is a GET route (see routes.go), and AddRemoteDTO has
-	// only `json` tags, no `query` tags (compare downloadFileDTO's
-	// `query:"file_id"` in files_DTO.go). c.Bind finds nothing to bind here
-	// and remoteContext is never read afterwards — this whole block does
-	// nothing. Either drop it, or this handler is meant to take no input at
-	// all (matches what GenerateKeys actually needs: none).
-	if err := c.Bind(&remoteContext); err != nil {
-		logger.Err(err).Msg("Can't bind file_id")
-		return echo.NewHTTPError(http.StatusBadRequest, "bad request")
-	}
-	// BUG: private key half (_) is thrown away. Needs: encrypt with app
-	// master key, stash in Redis under a key derived from userID (or a
-	// fresh pending-remote token returned alongside publicClientKey), short
-	// TTL — otherwise add_remote has no private key to authenticate with
-	// when it tries to verify this remote later.
-	_, publicClientKey, err := utils.GenerateKeys(logger)
+
+	privateClientKey, publicClientKey, err := utils.GenerateKeys(logger)
 	if err != nil {
 		logger.Err(err).Msg("failed to generate tokens")
 		return err
+	}
+	encryptedPrivateKey, err := crypt.EncryptMaster(masterKey, privateClientKey)
+	if err != nil {
+		logger.Err(err).Msg("failed to encrypt private key")
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
+	}
+
+	if err := cache.AddDataToSession(
+		c, redis,
+		logger, map[string]string{"privateKey": string(encryptedPrivateKey)},
+		10*time.Minute,
+	); err != nil {
+		logger.Err(err).Msg("failed to stash pending private key")
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
 	}
 
 	// remote_status.go
