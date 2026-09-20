@@ -40,7 +40,7 @@ func GetPublicKey(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, 
 
 	if err := cache.AddDataToSession(
 		c, redis,
-		logger, map[string]string{"privateKey": string(encryptedPrivateKey)},
+		logger, map[string]string{"publicKey": string(publicClientKey), "privateKey": string(encryptedPrivateKey)},
 		10*time.Minute,
 	); err != nil {
 		logger.Err(err).Msg("failed to stash pending private key")
