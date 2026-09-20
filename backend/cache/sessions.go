@@ -117,3 +117,11 @@ func GetUserIDFromSession(c *echo.Context, ctx context.Context, rdb *redis.Clien
 	}
 	return int32(parsedUserID), nil
 }
+
+func GetUserSession(c *echo.Context, ctx context.Context, rdb *redis.Client, logger *zerolog.Logger) (sessionID string, err error) {
+	sessionIDRaw, err := c.Cookie("session_id")
+	if err != nil {
+		return "", ErrSessionNotFound
+	}
+	return sessionIDRaw.Value, nil
+}
