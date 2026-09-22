@@ -8,7 +8,7 @@ type AddRemoteDTO struct {
 	// request with a range error before it even reaches the handler. Ports
 	// go up to 65535 — needs at least uint16 (or int/int32 to match how
 	// it's used elsewhere, e.g. strconv.Itoa(int(...)) in remote_status.go).
-	HostPort  int8   `json:"host_port"`
+	HostPort  int16  `json:"host_port"`
 	BasePath  string `json:"base_path"`
 	PublicKey string `json:"public_key"`
 }

@@ -32,7 +32,7 @@ func EncryptMaster(masterKey, plaintext []byte) ([]byte, error) {
 	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
-func DecryptMaster(masterKey, blob []byte) ([]byte, error) {
+func DecryptMaster(masterKey []byte, blob []byte) ([]byte, error) {
 	block, err := aes.NewCipher(masterKey)
 	if err != nil {
 		return nil, err
