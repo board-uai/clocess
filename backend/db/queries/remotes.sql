@@ -14,3 +14,6 @@ INSERT into remotes(user_id, host, port, username, base_path, public_key, host_k
 
 -- name: GetAllUserRemotes :many
 SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1;
+
+-- name: GetRemoteById :one
+SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 AND id = $2;
