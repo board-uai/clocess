@@ -50,6 +50,7 @@ list:
 upload:
 	curl -s -b $(COOKIE_JAR) -X POST $(BASE_URL)/file/upload \
 		-F "file=@$(FILE)" \
+		-F "server_host=$(SERVER_ID)" \
 		-w "\nHTTP %{http_code}\n"
 
 delete:

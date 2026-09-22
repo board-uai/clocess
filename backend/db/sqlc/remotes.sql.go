@@ -99,6 +99,36 @@ func (q *Queries) GetAllUserRemotes(ctx context.Context, userID int32) ([]GetAll
 	return items, nil
 }
 
+const getRemoteById = `-- name: GetRemoteById :one
+SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 AND id = $2
+`
+
+type GetRemoteByIdParams struct {
+	UserID int32 `json:"user_id"`
+	ID     int32 `json:"id"`
+}
+
+type GetRemoteByIdRow struct {
+	ID       int32  `json:"id"`
+	Host     string `json:"host"`
+	Port     int32  `json:"port"`
+	Username string `json:"username"`
+	BasePath string `json:"base_path"`
+}
+
+func (q *Queries) GetRemoteById(ctx context.Context, arg GetRemoteByIdParams) (GetRemoteByIdRow, error) {
+	row := q.db.QueryRow(ctx, getRemoteById, arg.UserID, arg.ID)
+	var i GetRemoteByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Host,
+		&i.Port,
+		&i.Username,
+		&i.BasePath,
+	)
+	return i, err
+}
+
 const getRemoteSecret = `-- name: GetRemoteSecret :many
 SELECT remote_id, encrypted_private_key, key_version FROM remote_secrets where remote_id = $1
 `

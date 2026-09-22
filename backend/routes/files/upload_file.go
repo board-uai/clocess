@@ -11,6 +11,7 @@ import (
 	"github.com/board-uai/clocess/db"
 	"github.com/board-uai/clocess/db/sqlc"
 	"github.com/board-uai/clocess/storage"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
@@ -38,10 +39,28 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 		logger.Err(err).Msg("Can't bind FileUploadStruct struct to request body")
 		return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 	}
+
 	if fileUploadData.File == nil {
-		logger.Err(err).Msg("Request came fileless")
+		logger.Info().Msg("Request came fileless")
 		return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 	}
+
+	queries := sqlc.New(db.Pool)
+	// run verification to check whatever front end submitted remote id is valid for user
+
+	remoteData, err := queries.GetRemoteById(ctx, sqlc.GetRemoteByIdParams{
+		UserID: userID,
+		ID:     fileUploadData.ServerID,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Err(err).Int32("serverID", fileUploadData.ServerID).Msg("user has no access to server")
+			return echo.NewHTTPError(http.StatusForbidden, "forbidden")
+		}
+		logger.Err(err).Int32("serverID", fileUploadData.ServerID).Msg("failed to verify user access to server")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to verify server access")
+	}
+
 	src, err := fileUploadData.File.Open()
 	if err != nil {
 		logger.Err(err).Msg("failed to open uploaded file")
@@ -52,8 +71,6 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 			s.Logger.Err(err).Msg("failed to close file")
 		}
 	}()
-
-	queries := sqlc.New(db.Pool)
 
 	file_id, err := queries.GetNextFileID(ctx)
 	if err != nil {
@@ -79,9 +96,7 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 		Filename: fileUploadData.File.Filename,
 		FileType: file_type,
 		DiskPath: file_path,
-		RemoteID: 1, // we ll need to fix this later.
-		// probably, automatically create a id=1 server as your machine
-		// maybe skip the main server, and user always needs to add a server before saving any data files
+		RemoteID: remoteData.ID,
 	})
 	if err != nil {
 		logger.Err(err).Int32("file_id", file_id).Msg("failed to write record about new file")
