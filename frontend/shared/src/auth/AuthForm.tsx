@@ -14,7 +14,7 @@ interface AuthPageProps {
 export function AuthPage({ status, title, lead, children }: AuthPageProps) {
   return (
     <div className="auth-in relative z-10 flex min-h-svh justify-center px-pad pt-[16svh] pb-16">
-      <div className="w-full max-w-100">
+      <div className="w-full max-w-[25rem]">
         {status && <div className="mb-4">{status}</div>}
         <h1 className="text-[44px] leading-[1.1] font-light tracking-[-0.02em] text-ink">{title}</h1>
         <p className="mt-3 mb-8 text-[15px] text-ink-2">{lead}</p>

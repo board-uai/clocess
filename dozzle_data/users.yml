@@ -1,0 +1,7 @@
+users:
+    admin:
+        email: "admin@example.com"
+        name: admin
+        password: $2a$11$btM2R8UhnCpreCgNEyJim.KA/g6F7AGRwK78WJjfwO5w7zwtkQY8W
+        filter: ""
+        roles: ""

@@ -13,7 +13,7 @@ export function useSignOut() {
     } finally {
       const websiteUrl = import.meta.env.VITE_WEBSITE_URL as string | undefined
       if (websiteUrl && window.location.origin !== new URL(websiteUrl).origin) {
-        window.location.href = websiteUrl
+        window.location.href = `${websiteUrl}?leaving=1`
         return
       }
       navigate('/', { replace: true })

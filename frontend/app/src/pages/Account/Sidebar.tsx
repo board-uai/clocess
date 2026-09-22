@@ -21,7 +21,7 @@ export function Sidebar() {
       className="fixed inset-x-0 top-0 z-20 flex h-16 items-center gap-4 bg-ground px-pad sm:inset-y-0 sm:right-auto sm:h-auto sm:w-72 sm:flex-col sm:items-stretch sm:gap-0 sm:px-6 sm:py-10"
     >
       <a
-        href={import.meta.env.VITE_WEBSITE_URL}
+        href={`${import.meta.env.VITE_WEBSITE_URL}?leaving=1`}
         className="font-mark text-[50px] leading-none text-ink sm:mb-8 sm:text-center"
       >
         clocess
