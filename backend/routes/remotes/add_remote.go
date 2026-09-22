@@ -63,7 +63,7 @@ func AddUserRemote(c *echo.Context, logger *zerolog.Logger, redis *redis.Client,
 	remoteID, err := queries.CreateRemote(ctx, sqlc.CreateRemoteParams{
 		UserID:             userID,
 		Host:               remoteContext.Host,
-		Port:               int32(remoteContext.HostPort),
+		Port:               remoteContext.HostPort,
 		Username:           remoteContext.HostUser,
 		BasePath:           remoteContext.BasePath,
 		PublicKey:          publicKey,
