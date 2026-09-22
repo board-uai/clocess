@@ -11,6 +11,11 @@ export function useSignOut() {
     try {
       await logout()
     } finally {
+      const websiteUrl = import.meta.env.VITE_WEBSITE_URL as string | undefined
+      if (websiteUrl && window.location.origin !== new URL(websiteUrl).origin) {
+        window.location.href = websiteUrl
+        return
+      }
       navigate('/', { replace: true })
       await refresh()
     }

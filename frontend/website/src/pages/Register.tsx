@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AuthFooter, AuthPage, Field, FormError, useAuthSubmit, useSession } from '@clocess/shared/auth'
 import { register } from '@clocess/shared/api'
 import { Button } from '@clocess/shared/ui'
 
 export function Register() {
-  const navigate = useNavigate()
   const { refresh } = useSession()
 
   const [email, setEmail] = useState('')
@@ -15,7 +14,7 @@ export function Register() {
     await register({ email, password })
     // the server already started a session, sending them to sign in again would ask twice
     await refresh()
-    navigate('/account', { replace: true })
+    window.location.href = `${import.meta.env.VITE_APP_URL}/account`
   })
 
   return (

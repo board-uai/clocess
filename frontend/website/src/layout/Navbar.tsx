@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Button } from '@clocess/shared/ui'
 import { useSession, useSignOut } from '@clocess/shared/auth'
 
@@ -92,9 +91,9 @@ export function Navbar({ atAuth, onLeave }: NavbarProps) {
 
               {open && (
                 <div className="absolute left-1/2 top-full z-30 mt-3 flex -translate-x-1/2 gap-3">
-                  <Link to="/account" onClick={() => setOpen(false)} className={PILL}>
+                  <a href={`${import.meta.env.VITE_APP_URL}/account`} className={PILL}>
                     account
-                  </Link>
+                  </a>
 
                   <button type="button" onClick={() => void signOut()} className={PILL}>
                     sign out

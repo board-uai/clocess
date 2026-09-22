@@ -1,4 +1,4 @@
-import { ArticlePage } from './components/ArticlePage'
+import { ArticlePage } from './parts/ArticlePage'
 import { DOCUMENTATION } from './documentation/pages'
 
 export function Documentation() {

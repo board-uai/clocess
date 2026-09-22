@@ -1,9 +1,8 @@
-import { Link, NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useSignOut } from '@clocess/shared/auth'
 
 const SECTIONS = [
   { label: 'Dashboard', to: '/account', end: true },
-  { label: 'Servers', to: '/account/servers', end: false },
   { label: 'Settings', to: '/account/profile', end: false },
 ]
 
@@ -21,9 +20,12 @@ export function Sidebar() {
       aria-label="Account"
       className="fixed inset-x-0 top-0 z-20 flex h-16 items-center gap-4 bg-ground px-pad sm:inset-y-0 sm:right-auto sm:h-auto sm:w-72 sm:flex-col sm:items-stretch sm:gap-0 sm:px-6 sm:py-10"
     >
-      <Link to="/" className="font-mark text-[50px] leading-none text-ink sm:mb-8 sm:text-center">
+      <a
+        href={import.meta.env.VITE_WEBSITE_URL}
+        className="font-mark text-[50px] leading-none text-ink sm:mb-8 sm:text-center"
+      >
         clocess
-      </Link>
+      </a>
 
       <ul className="flex gap-2 sm:flex-col sm:gap-3">
         {SECTIONS.map(({ label, to, end }) => (

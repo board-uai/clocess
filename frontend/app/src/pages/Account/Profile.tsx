@@ -1,4 +1,4 @@
-import { ChangePassword, DeactivateAccount, Identity, MachineCredentials } from '@/pages/components/settings'
+import { ChangePassword, DeactivateAccount, Identity, MachineCredentials } from '@/pages/Account/settings'
 
 export function Profile() {
   return (

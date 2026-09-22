@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthPage, Field, FormError, Status, forgetEmail, rememberedEmail, useAuthSubmit, useSession } from '@clocess/shared/auth'
 import { login } from '@clocess/shared/api'
 import { Button } from '@clocess/shared/ui'
@@ -7,9 +7,9 @@ import { Button } from '@clocess/shared/ui'
 /** where a guarded page lands once its session died, the email is already known */
 export function SignedOut() {
   const navigate = useNavigate()
-  const location = useLocation()
+  const [searchParams] = useSearchParams()
   const { refresh } = useSession()
-  const from = (location.state as { from?: string } | null)?.from ?? '/account'
+  const from = searchParams.get('from') ?? '/account'
 
   const [email] = useState(rememberedEmail)
   const [password, setPassword] = useState('')
@@ -17,14 +17,14 @@ export function SignedOut() {
   const { errors, pending, onSubmit } = useAuthSubmit(async () => {
     await login({ email: email ?? '', password })
     await refresh()
-    navigate(from, { replace: true })
+    window.location.href = `${import.meta.env.VITE_APP_URL}${from}`
   })
 
-  if (!email) return <Navigate to="/login" replace state={location.state} />
+  if (!email) return <Navigate to={`/login?${searchParams.toString()}`} replace />
 
   function notYou() {
     forgetEmail()
-    navigate('/login', { replace: true, state: location.state })
+    navigate(`/login?${searchParams.toString()}`, { replace: true })
   }
 
   // there is no email field here, so its error goes up top with the rest
