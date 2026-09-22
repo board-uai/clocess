@@ -30,6 +30,10 @@ services:
       - ./backend:/app
     depends_on:
       - postgres
+    secrets:
+      - remote_master_key
+    environment:
+      REMOTE_MASTER_KEY_FILE: /run/secrets/remote_master_key
 
   frontend:
     container_name: clocess_frontend
@@ -79,3 +83,7 @@ services:
 volumes:
   pgdata:
   redis-data:
+
+secrets:
+  remote_master_key:
+    file: ./secrets/remote_master.key

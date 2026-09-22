@@ -10,8 +10,8 @@ import (
 )
 
 const createFileRecord = `-- name: CreateFileRecord :one
-insert into files (id, user_id, filename, file_type, disk_path)
-  values ($1, $2, $3, $4, $5)
+insert into files (id, user_id, filename, file_type, disk_path, remote_id)
+  values ($1, $2, $3, $4, $5, $6)
   returning id
 `
 
@@ -21,6 +21,7 @@ type CreateFileRecordParams struct {
 	Filename string `json:"filename"`
 	FileType string `json:"file_type"`
 	DiskPath string `json:"disk_path"`
+	RemoteID int32  `json:"remote_id"`
 }
 
 func (q *Queries) CreateFileRecord(ctx context.Context, arg CreateFileRecordParams) (int32, error) {
@@ -30,6 +31,7 @@ func (q *Queries) CreateFileRecord(ctx context.Context, arg CreateFileRecordPara
 		arg.Filename,
 		arg.FileType,
 		arg.DiskPath,
+		arg.RemoteID,
 	)
 	var id int32
 	err := row.Scan(&id)

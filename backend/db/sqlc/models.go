@@ -15,6 +15,26 @@ type File struct {
 	FileType  string             `json:"file_type"`
 	DiskPath  string             `json:"disk_path"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	RemoteID  int32              `json:"remote_id"`
+}
+
+type Remote struct {
+	ID                 int32              `json:"id"`
+	UserID             int32              `json:"user_id"`
+	Host               string             `json:"host"`
+	Port               int32              `json:"port"`
+	Username           string             `json:"username"`
+	BasePath           string             `json:"base_path"`
+	PublicKey          string             `json:"public_key"`
+	HostKeyFingerprint pgtype.Text        `json:"host_key_fingerprint"`
+	CreatedAt          pgtype.Timestamptz `json:"created_at"`
+}
+
+type RemoteSecret struct {
+	ID                  int32       `json:"id"`
+	RemoteID            pgtype.Int4 `json:"remote_id"`
+	EncryptedPrivateKey []byte      `json:"encrypted_private_key"`
+	KeyVersion          int16       `json:"key_version"`
 }
 
 type User struct {
