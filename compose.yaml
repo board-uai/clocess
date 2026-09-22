@@ -35,17 +35,37 @@ services:
     environment:
       REMOTE_MASTER_KEY_FILE: /run/secrets/remote_master_key
 
-  frontend:
-    container_name: clocess_frontend
+  website:
+    container_name: clocess_website
     build:
       context: ./frontend
+      dockerfile: website/Dockerfile
       args:
         NODE_VERSION: ${NODE_VERSION:-22}
     env_file:
-      - ./frontend/.env
+      - ./frontend/website/.env
     volumes:
       - ./frontend:/frontend
       - /frontend/node_modules
+      - /frontend/shared/node_modules
+      - /frontend/website/node_modules
+    depends_on:
+      - backend
+
+  app:
+    container_name: clocess_app
+    build:
+      context: ./frontend
+      dockerfile: app/Dockerfile
+      args:
+        NODE_VERSION: ${NODE_VERSION:-22}
+    env_file:
+      - ./frontend/app/.env
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+      - /frontend/shared/node_modules
+      - /frontend/app/node_modules
     depends_on:
       - backend
 
