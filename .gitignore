@@ -16,6 +16,7 @@ backend/logs/
 *.env*
 !.env.example
 !.env.frontend.example
+!.env.production
 
 compose.override.yaml
 
