@@ -47,6 +47,5 @@ func GetPublicKey(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, 
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal error")
 	}
 
-	// remote_status.go
-	return c.JSON(http.StatusOK, map[string]any{"publicClientKey": publicClientKey})
+	return c.JSON(http.StatusOK, map[string]any{"publicClientKey": string(publicClientKey)})
 }

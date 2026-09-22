@@ -2,6 +2,7 @@ package remotes
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/board-uai/clocess/cache"
 	"github.com/board-uai/clocess/db"
@@ -42,7 +43,8 @@ func AddUserRemote(c *echo.Context, logger *zerolog.Logger, redis *redis.Client,
 		return err
 	}
 
-	if remoteContext.PublicKey != sessionData["publicKey"] {
+	publicKey := strings.TrimSpace(sessionData["publicKey"])
+	if strings.TrimSpace(remoteContext.PublicKey) != publicKey {
 		return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 	}
 	decryptPrivateKey, err := crypt.DecryptMaster(masterKey, []byte(sessionData["privateKey"]))
@@ -64,7 +66,7 @@ func AddUserRemote(c *echo.Context, logger *zerolog.Logger, redis *redis.Client,
 		Port:               int32(remoteContext.HostPort),
 		Username:           remoteContext.HostUser,
 		BasePath:           remoteContext.BasePath,
-		PublicKey:          sessionData["publicKey"],
+		PublicKey:          publicKey,
 		HostKeyFingerprint: pgtype.Text{String: fingerprints, Valid: true},
 	})
 	if err != nil {
