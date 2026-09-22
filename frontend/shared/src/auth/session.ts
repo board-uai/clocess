@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { User } from '@/lib/api'
+import type { User } from '../api'
 
 /** checking is the gap before the first /user/me comes back */
 export type SessionStatus = 'checking' | 'in' | 'out'

@@ -6,7 +6,7 @@ import { ForgotPassword } from "./pages/ForgotPassword";
 import { SignedOut } from "./pages/SignedOut";
 import { Account, Dashboard, Profile } from "./pages/Account";
 import { Api, Docs, Documentation, Overview } from "./pages/Docs";
-import { RedirectIfAuthed, RequireAuth } from "./auth/CheckAuth";
+import { RedirectIfAuthed, RequireAuth } from "@clocess/shared/auth";
 import ErrorPage from "./pages/ErrorPage";
 
 export const router = createBrowserRouter([

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AuthFooter, AuthPage, Field, Status } from '@/auth'
-import { Button } from '@/ui/Button'
+import { AuthFooter, AuthPage, Field, Status } from '@clocess/shared/auth'
+import { Button } from '@clocess/shared/ui'
 
 const RESEND_WAIT = 60
 

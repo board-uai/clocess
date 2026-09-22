@@ -1,4 +1,4 @@
-import { useAuth } from '@/auth'
+import { useAuth } from '@clocess/shared/auth'
 import { Panel } from './Panel'
 
 export function Identity() {

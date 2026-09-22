@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AuthFooter, AuthPage, Field, FormError, useAuthSubmit, useSession } from '@/auth'
-import { register } from '@/lib/api'
-import { Button } from '@/ui/Button'
+import { AuthFooter, AuthPage, Field, FormError, useAuthSubmit, useSession } from '@clocess/shared/auth'
+import { register } from '@clocess/shared/api'
+import { Button } from '@clocess/shared/ui'
 
 export function Register() {
   const navigate = useNavigate()

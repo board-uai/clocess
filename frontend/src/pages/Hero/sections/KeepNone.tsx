@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { Button } from '@/ui/Button'
+import { Button } from '@clocess/shared/ui'
 import { Bar } from '../parts/Bar'
 import { roomLeft } from '../lib/quota'
 import { ACCENT, TONE, TYPE } from '../lib/tone'

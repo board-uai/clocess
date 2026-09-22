@@ -1,0 +1,28 @@
+{
+  "name": "@clocess/shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./ui": "./src/ui/index.ts",
+    "./api": "./src/api/index.ts",
+    "./auth": "./src/auth/index.ts",
+    "./files": "./src/files/index.ts",
+    "./scene": "./src/scene/index.ts",
+    "./void": "./src/void/index.ts",
+    "./theme.css": "./src/theme.css"
+  },
+  "dependencies": {
+    "@untitledui/icons": "^0.0.22",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.2",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.185.1",
+    "typescript": "~6.0.2"
+  }
+}

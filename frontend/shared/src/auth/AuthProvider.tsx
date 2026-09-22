@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { SESSION_LOST, me } from '@/lib/api'
-import type { User } from '@/lib/api'
+import { SESSION_LOST, me } from '../api'
+import type { User } from '../api'
 import { SessionCtx, rememberEmail } from './session'
 import type { SessionStatus } from './session'
 

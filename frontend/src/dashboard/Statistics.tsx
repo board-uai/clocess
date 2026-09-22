@@ -1,4 +1,4 @@
-import { Container } from "@/ui/Container";
+import { Container } from "@clocess/shared/ui";
 import type { useDashboard } from "./useDashboard";
 
 type Stats = ReturnType<typeof useDashboard>["stats"];

@@ -1,5 +1,5 @@
-import { Container } from '@/ui/Container'
-import type { FileRecord } from '@/lib/api'
+import { Container } from '../ui'
+import type { FileRecord } from '../api'
 
 const KINDS = ['image', 'video', 'audio', 'document', 'other']
 

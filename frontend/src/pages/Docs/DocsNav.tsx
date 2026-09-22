@@ -1,6 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
-import { Button } from '@/ui/Button'
-import { useSession } from '@/auth'
+import { Button } from '@clocess/shared/ui'
+import { useSession } from '@clocess/shared/auth'
 
 const SECTIONS = [
   { label: 'docs', to: '/docs', end: true },

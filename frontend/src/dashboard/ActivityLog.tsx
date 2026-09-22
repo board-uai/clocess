@@ -6,7 +6,7 @@ import {
   Expand01,
   SearchSm,
 } from "@untitledui/icons";
-import { Container } from "@/ui/Container";
+import { Container } from "@clocess/shared/ui";
 import type { ActivityEntry } from "./useDashboard";
 
 // fixed dark palette, deliberately NOT the fill/on-fill tokens — a terminal

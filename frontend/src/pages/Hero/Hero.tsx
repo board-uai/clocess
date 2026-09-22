@@ -4,7 +4,7 @@ import { Boxes } from './sections/Boxes'
 import { Everything } from './sections/Everything'
 import { Handshake } from './sections/Handshake'
 import { KeepNone } from './sections/KeepNone'
-import { SAY_Y } from '@/scene'
+import { SAY_Y } from '@clocess/shared/scene'
 
 const GAP = 'h-[clamp(320px,42vh,560px)]'
 

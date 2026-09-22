@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Container } from '@/ui/Container'
+import { Container } from '@clocess/shared/ui'
 
 /** the mono caption every settings card opens with */
 export const PANEL_TITLE = 'font-mono text-[15px] text-ink-3'

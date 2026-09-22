@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { createScene } from '@/scene'
-import type { SceneHandle, StageName } from '@/scene'
+import { createScene } from '../scene'
+import type { SceneHandle, StageName } from '../scene'
 
 interface VoidProps {
   /** where the logo should be, the url owns this */

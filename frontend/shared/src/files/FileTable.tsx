@@ -1,6 +1,6 @@
-import { Container } from '@/ui/Container'
-import { downloadUrl } from '@/lib/api'
-import type { FileRecord } from '@/lib/api'
+import { Container } from '../ui'
+import { downloadUrl } from '../api'
+import type { FileRecord } from '../api'
 import type { FilesStatus } from './useFiles'
 
 const ROW = 'flex items-center gap-4 border-b border-hair py-3 last:border-0'

@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import { useSignOut } from '@/auth'
+import { useSignOut } from '@clocess/shared/auth'
 
 const SECTIONS = [
   { label: 'Dashboard', to: '/account', end: true },

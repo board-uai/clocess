@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Container } from '@/ui/Container'
+import { Container } from '../ui'
 
 interface UploadDropProps {
   busy: boolean

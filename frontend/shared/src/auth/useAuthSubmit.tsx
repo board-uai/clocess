@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ApiError } from '@/lib/api'
+import { ApiError } from '../api'
 
 export interface AuthErrors {
   email?: ReactNode

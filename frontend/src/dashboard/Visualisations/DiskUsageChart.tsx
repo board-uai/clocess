@@ -1,4 +1,4 @@
-import { Container } from "@/ui/Container";
+import { Container } from "@clocess/shared/ui";
 import type { ServerStat } from "../useDashboard";
 
 export const DiskUsageChart = ({ servers }: { servers: ServerStat[] }) => {

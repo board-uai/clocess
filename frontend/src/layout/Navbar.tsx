@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from '@/ui/Button'
-import { useSession, useSignOut } from '@/auth'
+import { Button } from '@clocess/shared/ui'
+import { useSession, useSignOut } from '@clocess/shared/auth'
 
 const DESTINATIONS = [
   { label: 'docs', to: '/docs' },

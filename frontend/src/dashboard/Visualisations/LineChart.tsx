@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container } from "@/ui/Container";
+import { Container } from "@clocess/shared/ui";
 import type { ServerSeries } from "../useDashboard";
 
 interface LineChartProps {

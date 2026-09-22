@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { AuthFooter, AuthPage, Field, FormError, useAuthSubmit, useSession } from '@/auth'
-import { login } from '@/lib/api'
-import { Button } from '@/ui/Button'
+import { AuthFooter, AuthPage, Field, FormError, useAuthSubmit, useSession } from '@clocess/shared/auth'
+import { login } from '@clocess/shared/api'
+import { Button } from '@clocess/shared/ui'
 
 export function Login() {
   const navigate = useNavigate()

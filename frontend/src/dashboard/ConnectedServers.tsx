@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Container } from "@/ui/Container";
+import { Container } from "@clocess/shared/ui";
 import type { ServerStat } from "./useDashboard";
 
 // one grid shared by the header AND every row, so columns are guaranteed to

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSession } from '@/auth'
-import { deactivate } from '@/lib/api'
-import { Button } from '@/ui/Button'
-import { Container } from '@/ui/Container'
+import { useSession } from '@clocess/shared/auth'
+import { deactivate } from '@clocess/shared/api'
+import { Button } from '@clocess/shared/ui'
+import { Container } from '@clocess/shared/ui'
 import { PANEL, PANEL_TITLE } from './Panel'
 
 export function DeactivateAccount() {

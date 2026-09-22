@@ -1,4 +1,4 @@
-import { AUTH_DUR, type StageName } from "@/scene";
+import { AUTH_DUR, type StageName } from "../scene";
 import { useCallback, useEffect, useState } from "react";
 import type { Location, NavigateFunction } from "react-router-dom";
 

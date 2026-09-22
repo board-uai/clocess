@@ -6,7 +6,7 @@ import {
   Expand01,
   SearchSm,
 } from "@untitledui/icons";
-import { Container } from "@/ui/Container";
+import { Container } from "@clocess/shared/ui";
 import type { AlertEntry } from "./useDashboard";
 
 // same fixed dark palette as ActivityLog — a terminal panel stays dark

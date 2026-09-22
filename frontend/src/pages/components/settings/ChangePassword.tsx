@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { ComponentProps, FormEvent } from 'react'
 import { Eye, EyeOff } from '@untitledui/icons'
-import { useAuth } from '@/auth'
-import { changePassword } from '@/lib/api'
-import { Button } from '@/ui/Button'
+import { useAuth } from '@clocess/shared/auth'
+import { changePassword } from '@clocess/shared/api'
+import { Button } from '@clocess/shared/ui'
 import { Panel } from './Panel'
 
 const LABEL = 'mb-2 block font-mono text-[14px] text-ink-2'

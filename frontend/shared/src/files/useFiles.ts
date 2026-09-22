@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { deleteFile, listFiles, uploadFile } from '@/lib/api'
-import type { FileRecord } from '@/lib/api'
+import { deleteFile, listFiles, uploadFile } from '../api'
+import type { FileRecord } from '../api'
 
 export type FilesStatus = 'loading' | 'ready' | 'failed'
 

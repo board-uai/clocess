@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent, KeyboardEvent } from 'react'
-import { FileIcon } from '@/files'
+import { FileIcon } from '@clocess/shared/files'
 import { ROUND, TONE, TYPE } from '../lib/tone'
 import { THROW_CSS, useVanish } from '../lib/motion'
 import { useYard } from '../lib/useYard'

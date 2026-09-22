@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { AuthPage, Field, FormError, Status, forgetEmail, rememberedEmail, useAuthSubmit, useSession } from '@/auth'
-import { login } from '@/lib/api'
-import { Button } from '@/ui/Button'
+import { AuthPage, Field, FormError, Status, forgetEmail, rememberedEmail, useAuthSubmit, useSession } from '@clocess/shared/auth'
+import { login } from '@clocess/shared/api'
+import { Button } from '@clocess/shared/ui'
 
 /** where a guarded page lands once its session died, the email is already known */
 export function SignedOut() {

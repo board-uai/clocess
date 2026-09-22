@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { logout } from '@/lib/api'
+import { logout } from '../api'
 import { forgetEmail, useSession } from './session'
 
 export function useSignOut() {
