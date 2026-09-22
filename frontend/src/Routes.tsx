@@ -42,8 +42,6 @@ export const router = createBrowserRouter([
             element: <Account />,
             children: [
               { index: true, element: <Dashboard /> },
-              // Uncomment when servers page is done, don't forget about it dumbass
-              // { path: "servers", element: <Servers /> },
               { path: "profile", element: <Profile /> },
             ],
           },

@@ -1,4 +1,5 @@
-FROM node:22-alpine
+ARG NODE_VERSION=22
+FROM node:${NODE_VERSION}-alpine
 WORKDIR /frontend
 COPY package.json package-lock.json ./
 RUN npm install

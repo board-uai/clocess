@@ -1,4 +1,4 @@
-import { Callout, SectionTitle } from '../../components/prose'
+import { Callout, SectionTitle } from '../../components/Prose'
 
 export function Introduction() {
   return (
