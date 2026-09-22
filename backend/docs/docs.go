@@ -240,6 +240,126 @@ const docTemplate = `{
                 }
             }
         },
+        "/remote/add_remote": {
+            "post": {
+                "description": "Client must already hold the public key returned by GET /remote/get_key.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "remotes"
+                ],
+                "summary": "Add a remote server (SSH/SFTP) for the current user",
+                "parameters": [
+                    {
+                        "description": "host, host_user, host_port, base_path, public_key",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/remotes.AddRemoteDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/remote/get_key": {
+            "get": {
+                "description": "Private key stays server-side and never leaves this handler as-is (see TODO below); client only ever gets the public key to paste into their server's authorized_keys.",
+                "tags": [
+                    "remotes"
+                ],
+                "summary": "Generate a keypair for a new remote and return the public half",
+                "responses": {
+                    "200": {
+                        "description": "publicClientKey",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "invalid session",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/remote/get_remotes": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "remotes"
+                ],
+                "summary": "List the current user's connected remotes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "invalid session",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/create": {
             "post": {
                 "description": "Creates a user account and starts a session",
@@ -273,7 +393,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "invalid body / invalid email / password too short",
+                        "description": "invalid body / invalid email / password too short / too long",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -304,7 +424,7 @@ const docTemplate = `{
         },
         "/user/login": {
             "post": {
-                "description": "Verifies credentials, activates the account if inactive, and starts a new session",
+                "description": "Verifies credentials and starts a new session, a deactivated account is refused",
                 "consumes": [
                     "application/json"
                 ],
@@ -345,6 +465,15 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "invalid credentials",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "this account is deactivated",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -428,7 +557,7 @@ const docTemplate = `{
         },
         "/user/settings/change_password": {
             "patch": {
-                "description": "Requires an active session and confirmation of the current password",
+                "description": "Requires an active session and confirmation of the current password, ends every other session",
                 "consumes": [
                     "application/json"
                 ],
@@ -461,7 +590,16 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "invalid session / wrong old password",
+                        "description": "invalid session",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "current password is wrong",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -530,6 +668,26 @@ const docTemplate = `{
             "properties": {
                 "file_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "remotes.AddRemoteDTO": {
+            "type": "object",
+            "properties": {
+                "base_path": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "host_port": {
+                    "type": "integer"
+                },
+                "host_user": {
+                    "type": "string"
+                },
+                "public_key": {
+                    "type": "string"
                 }
             }
         },
