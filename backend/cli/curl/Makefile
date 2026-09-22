@@ -67,6 +67,10 @@ get-key:
 	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/get_key \
 		-w "\nHTTP %{http_code}\n"
 
+get-remotes:
+	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/get_remotes \
+		-w "\nHTTP %{http_code}\n"
+
 # PUBLIC_KEY must be the exact "publicClientKey" value from `make get-key`
 # (valid 10 min, one shot per add-remote call) — session forgets it after.
 add-remote:

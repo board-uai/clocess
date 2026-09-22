@@ -12,6 +12,19 @@ definitions:
       file_id:
         type: integer
     type: object
+  remotes.AddRemoteDTO:
+    properties:
+      base_path:
+        type: string
+      host:
+        type: string
+      host_port:
+        type: integer
+      host_user:
+        type: string
+      public_key:
+        type: string
+    type: object
   settings.changeUserPasswordDTO:
     properties:
       old_password:
@@ -172,6 +185,87 @@ paths:
       summary: Health check
       tags:
       - health
+  /remote/add_remote:
+    post:
+      consumes:
+      - application/json
+      description: Client must already hold the public key returned by GET /remote/get_key.
+      parameters:
+      - description: host, host_user, host_port, base_path, public_key
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/remotes.AddRemoteDTO'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a remote server (SSH/SFTP) for the current user
+      tags:
+      - remotes
+  /remote/get_key:
+    get:
+      description: Private key stays server-side and never leaves this handler as-is
+        (see TODO below); client only ever gets the public key to paste into their
+        server's authorized_keys.
+      responses:
+        "200":
+          description: publicClientKey
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: invalid session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Generate a keypair for a new remote and return the public half
+      tags:
+      - remotes
+  /remote/get_remotes:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: invalid session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List the current user's connected remotes
+      tags:
+      - remotes
   /user/create:
     post:
       consumes:
@@ -193,7 +287,7 @@ paths:
             additionalProperties: true
             type: object
         "400":
-          description: invalid body / invalid email / password too short
+          description: invalid body / invalid email / password too short / too long
           schema:
             additionalProperties:
               type: string
@@ -217,8 +311,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Verifies credentials, activates the account if inactive, and starts
-        a new session
+      description: Verifies credentials and starts a new session, a deactivated account
+        is refused
       parameters:
       - description: email + password
         in: body
@@ -242,6 +336,12 @@ paths:
             type: object
         "401":
           description: invalid credentials
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: this account is deactivated
           schema:
             additionalProperties:
               type: string
@@ -301,7 +401,8 @@ paths:
     patch:
       consumes:
       - application/json
-      description: Requires an active session and confirmation of the current password
+      description: Requires an active session and confirmation of the current password,
+        ends every other session
       parameters:
       - description: old_password + new_password (min 8 chars)
         in: body
@@ -319,7 +420,13 @@ paths:
               type: string
             type: object
         "401":
-          description: invalid session / wrong old password
+          description: invalid session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: current password is wrong
           schema:
             additionalProperties:
               type: string

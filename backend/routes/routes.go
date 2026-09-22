@@ -75,6 +75,10 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 			return remotes.GetPublicKey(c, logger, redis, masterKey)
 		})
 
+		r.GET("/get_remotes", func(c *echo.Context) error {
+			return remotes.GetAllUserRemotes(c, logger, redis)
+		})
+
 		r.POST("/add_remote", func(c *echo.Context) error {
 			return remotes.AddUserRemote(c, logger, redis, masterKey)
 		})
