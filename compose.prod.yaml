@@ -1,0 +1,31 @@
+services:
+  website:
+    build:
+      context: ./frontend
+      dockerfile: website/Dockerfile
+      target: prod
+      args:
+        NODE_VERSION: ${NODE_VERSION:-22}
+    env_file: !reset []
+    volumes: !reset []
+
+  app:
+    build:
+      context: ./frontend
+      dockerfile: app/Dockerfile
+      target: prod
+      args:
+        NODE_VERSION: ${NODE_VERSION:-22}
+    env_file: !reset []
+    volumes: !reset []
+
+  edge:
+    container_name: clocess_edge
+    build:
+      context: ./frontend/edge
+    ports:
+      - "${EDGE_PORT:-80}:80"
+    depends_on:
+      - website
+      - app
+      - backend
