@@ -11,6 +11,37 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const createRemote = `-- name: CreateRemote :one
+INSERT into remotes(user_id, host, port, username, base_path, public_key, host_key_fingerprint)
+  values ($1, $2, $3, $4, $5, $6, $7)
+  returning id
+`
+
+type CreateRemoteParams struct {
+	UserID             int32       `json:"user_id"`
+	Host               string      `json:"host"`
+	Port               int32       `json:"port"`
+	Username           string      `json:"username"`
+	BasePath           string      `json:"base_path"`
+	PublicKey          string      `json:"public_key"`
+	HostKeyFingerprint pgtype.Text `json:"host_key_fingerprint"`
+}
+
+func (q *Queries) CreateRemote(ctx context.Context, arg CreateRemoteParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createRemote,
+		arg.UserID,
+		arg.Host,
+		arg.Port,
+		arg.Username,
+		arg.BasePath,
+		arg.PublicKey,
+		arg.HostKeyFingerprint,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
 const createRemoteSecret = `-- name: CreateRemoteSecret :one
 INSERT into remote_secrets(remote_id, encrypted_private_key, key_version)
   values ($1, $2, $3)

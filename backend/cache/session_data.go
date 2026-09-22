@@ -26,7 +26,7 @@ func AddDataToSession(c *echo.Context, redis *redis.Client, logger *zerolog.Logg
 	return nil
 }
 
-func ReadSessionData(c *echo.Context, redis *redis.Client, logger *zerolog.Logger) (map[string]string, error) {
+func GetSessionData(c *echo.Context, redis *redis.Client, logger *zerolog.Logger) (map[string]string, error) {
 	ctx := c.Request().Context()
 
 	userSessionID, err := GetUserSession(c, ctx, redis, logger)
