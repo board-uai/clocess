@@ -51,9 +51,20 @@ func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Clie
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get filename name of fileID")
 	}
 
+	remoteInfo, err := queries.GetServerConnectionInfo(ctx, downloadFileData.RemoteID)
+	if err != nil {
+		return nil
+	}
+
 	remoteConnectionInfo := storage.RemoteConnection{
-		UserID: userID,
-		// continue on remote info
+		UserID:           userID,
+		RemoteID:         downloadFileData.RemoteID,
+		RemoteHost:       remoteInfo[0].Host,
+		RemotePort:       remoteInfo[0].Port,
+		RemoteUsername:   remoteInfo[0].Username,
+		RemoteBasePath:   remoteInfo[0].BasePath,
+		RemotePrivKey:    remoteInfo[0].EncryptedPrivateKey,
+		RemoteKeyVersion: remoteInfo[0].KeyVersion,
 	}
 	file, err := s.Read(remoteConnectionInfo, int(downloadFileData.FileID), filename)
 	if err != nil {

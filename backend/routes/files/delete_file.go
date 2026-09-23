@@ -45,9 +45,20 @@ func DeleteFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s 
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get filename name of fileID")
 	}
 
+	remoteInfo, err := queries.GetServerConnectionInfo(ctx, deleteFileRequest.RemoteID)
+	if err != nil {
+		return nil
+	}
+
 	remoteConnectionInfo := storage.RemoteConnection{
-		UserID: userID,
-		// continue on remote info
+		UserID:           userID,
+		RemoteID:         deleteFileRequest.RemoteID,
+		RemoteHost:       remoteInfo[0].Host,
+		RemotePort:       remoteInfo[0].Port,
+		RemoteUsername:   remoteInfo[0].Username,
+		RemoteBasePath:   remoteInfo[0].BasePath,
+		RemotePrivKey:    remoteInfo[0].EncryptedPrivateKey,
+		RemoteKeyVersion: remoteInfo[0].KeyVersion,
 	}
 
 	if err := s.DeleteFile(remoteConnectionInfo, int(deleteFileRequest.FileID), filename); err != nil {

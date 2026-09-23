@@ -50,14 +50,14 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 
 	remoteData, err := queries.GetRemoteById(ctx, sqlc.GetRemoteByIdParams{
 		UserID: userID,
-		ID:     fileUploadData.ServerID,
+		ID:     fileUploadData.RemoteId,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			logger.Err(err).Int32("serverID", fileUploadData.ServerID).Msg("user has no access to server")
+			logger.Err(err).Int32("serverID", fileUploadData.RemoteId).Msg("user has no access to server")
 			return echo.NewHTTPError(http.StatusForbidden, "forbidden")
 		}
-		logger.Err(err).Int32("serverID", fileUploadData.ServerID).Msg("failed to verify user access to server")
+		logger.Err(err).Int32("serverID", fileUploadData.RemoteId).Msg("failed to verify user access to server")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to verify server access")
 	}
 

@@ -170,7 +170,7 @@ SELECT
     remote_secrets.key_version 
 FROM remotes
 INNER JOIN remote_secrets 
-    ON remotes.id = remote_secrets.remote_id
+    ON remotes.id = $1
 `
 
 type GetServerConnectionInfoRow struct {
@@ -183,8 +183,8 @@ type GetServerConnectionInfoRow struct {
 	KeyVersion          int16  `json:"key_version"`
 }
 
-func (q *Queries) GetServerConnectionInfo(ctx context.Context) ([]GetServerConnectionInfoRow, error) {
-	rows, err := q.db.Query(ctx, getServerConnectionInfo)
+func (q *Queries) GetServerConnectionInfo(ctx context.Context, id int32) ([]GetServerConnectionInfoRow, error) {
+	rows, err := q.db.Query(ctx, getServerConnectionInfo, id)
 	if err != nil {
 		return nil, err
 	}

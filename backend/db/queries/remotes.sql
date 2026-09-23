@@ -32,4 +32,4 @@ SELECT
     remote_secrets.key_version 
 FROM remotes
 INNER JOIN remote_secrets 
-    ON remotes.id = remote_secrets.remote_id;
+    ON remotes.id = $1;
