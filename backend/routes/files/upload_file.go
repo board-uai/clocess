@@ -28,7 +28,7 @@ import (
 // @Failure      401   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Router       /file/upload [post]
-func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage) error {
+func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage, masterKey []byte) error {
 	var fileUploadData fileUploadDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
@@ -84,7 +84,11 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to analyze file_type")
 	}
 
-	file_path, err := s.Save(int(userID), int(file_id), fileUploadData.File.Filename, src)
+	remoteConnectionInfo := storage.RemoteConnection{
+		UserID: userID,
+		// continue on remote info
+	}
+	file_path, err := s.Save(remoteConnectionInfo, int(file_id), fileUploadData.File.Filename, src)
 	if err != nil {
 		logger.Err(err).Int32("file_id", file_id).Msg("failed to save file on server")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save file")

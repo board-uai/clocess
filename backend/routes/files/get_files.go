@@ -20,7 +20,7 @@ import (
 // @Failure      401  {object}  map[string]string  "invalid session"
 // @Failure      500  {object}  map[string]string
 // @Router       /file/get_all [get]
-func GetAllUserFiles(c *echo.Context, logger *zerolog.Logger, redis *redis.Client) error {
+func GetAllUserFiles(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, masterKey []byte) error {
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
 	if err != nil {

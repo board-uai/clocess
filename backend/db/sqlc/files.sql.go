@@ -39,20 +39,56 @@ func (q *Queries) CreateFileRecord(ctx context.Context, arg CreateFileRecordPara
 }
 
 const deleteFile = `-- name: DeleteFile :one
-delete from files where id = $1 and user_id = $2
+delete from files where id = $1 and user_id = $2 and remote_id = $3
 returning filename
 `
 
 type DeleteFileParams struct {
-	ID     int32 `json:"id"`
-	UserID int32 `json:"user_id"`
+	ID       int32 `json:"id"`
+	UserID   int32 `json:"user_id"`
+	RemoteID int32 `json:"remote_id"`
 }
 
 func (q *Queries) DeleteFile(ctx context.Context, arg DeleteFileParams) (string, error) {
-	row := q.db.QueryRow(ctx, deleteFile, arg.ID, arg.UserID)
+	row := q.db.QueryRow(ctx, deleteFile, arg.ID, arg.UserID, arg.RemoteID)
 	var filename string
 	err := row.Scan(&filename)
 	return filename, err
+}
+
+const getAllUserFileRemote = `-- name: GetAllUserFileRemote :many
+SELECT id, filename, file_type from files where user_id = $1 and remote_id = $2
+`
+
+type GetAllUserFileRemoteParams struct {
+	UserID   int32 `json:"user_id"`
+	RemoteID int32 `json:"remote_id"`
+}
+
+type GetAllUserFileRemoteRow struct {
+	ID       int32  `json:"id"`
+	Filename string `json:"filename"`
+	FileType string `json:"file_type"`
+}
+
+func (q *Queries) GetAllUserFileRemote(ctx context.Context, arg GetAllUserFileRemoteParams) ([]GetAllUserFileRemoteRow, error) {
+	rows, err := q.db.Query(ctx, getAllUserFileRemote, arg.UserID, arg.RemoteID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllUserFileRemoteRow
+	for rows.Next() {
+		var i GetAllUserFileRemoteRow
+		if err := rows.Scan(&i.ID, &i.Filename, &i.FileType); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getAllUserFiles = `-- name: GetAllUserFiles :many
@@ -86,16 +122,17 @@ func (q *Queries) GetAllUserFiles(ctx context.Context, userID int32) ([]GetAllUs
 }
 
 const getFileName = `-- name: GetFileName :one
-select filename from files where id = $1 and user_id = $2
+select filename from files where id = $1 and user_id = $2 and remote_id = $3
 `
 
 type GetFileNameParams struct {
-	ID     int32 `json:"id"`
-	UserID int32 `json:"user_id"`
+	ID       int32 `json:"id"`
+	UserID   int32 `json:"user_id"`
+	RemoteID int32 `json:"remote_id"`
 }
 
 func (q *Queries) GetFileName(ctx context.Context, arg GetFileNameParams) (string, error) {
-	row := q.db.QueryRow(ctx, getFileName, arg.ID, arg.UserID)
+	row := q.db.QueryRow(ctx, getFileName, arg.ID, arg.UserID, arg.RemoteID)
 	var filename string
 	err := row.Scan(&filename)
 	return filename, err
