@@ -16,5 +16,5 @@ type RemoteConnection struct {
 	RemoteUsername   string
 	RemoteBasePath   string
 	RemotePrivKey    []byte
-	RemoteKeyVersion int32
+	RemoteKeyVersion int16
 }
