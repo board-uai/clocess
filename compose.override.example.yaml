@@ -14,7 +14,12 @@ services:
       - "127.0.0.1:[host_port]:[container_port]"
     restart: unless-stopped
 
-  frontend:
+  website:
+    ports:
+      - "127.0.0.1:[host_port]:[container_port]"
+    restart: unless-stopped
+
+  app:
     ports:
       - "127.0.0.1:[host_port]:[container_port]"
     restart: unless-stopped

@@ -1,0 +1,170 @@
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* the wordmark face, only ever set on the mark itself */
+@font-face {
+  font-family: "bitwise";
+  src: url("/fonts/bitwise.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+:root {
+  color-scheme: light;
+
+  --ground:  #FFFFFF;
+  --raise:   #FFFFFF;
+  --line:    #E2E6EC;
+  --hair:    #EEF1F5;
+  --ink:     #0B0D10;
+  --ink-2:   #576069;
+  --ink-3:   #8A939D;
+  --fill:    #0B0D10;
+  --on-fill: #FFFFFF;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --ground:  #070809;
+  --raise:   #0D0F11;
+  --line:    #1A1D21;
+  --hair:    #131619;
+  --ink:     #F6F7F7;
+  --ink-2:   #9BA2AA;
+  --ink-3:   #5E656E;
+  --fill:    #FFFFFF;
+  --on-fill: #070809;
+}
+
+@theme inline {
+  --color-ground:  var(--ground);
+  --color-raise:   var(--raise);
+  --color-line:    var(--line);
+  --color-hair:    var(--hair);
+  --color-ink:     var(--ink);
+  --color-ink-2:   var(--ink-2);
+  --color-ink-3:   var(--ink-3);
+  --color-fill:    var(--fill);
+  --color-on-fill: var(--on-fill);
+
+  /* body copy */
+  --font-sans: "bc-civitas", ui-sans-serif, system-ui, sans-serif;
+  --font-mark: "bitwise", ui-monospace, monospace;
+
+  --radius-pill:    999px;
+  --spacing-pad:    clamp(20px, 6vw, 56px);
+  --container-page: 1080px;
+}
+
+@layer base {
+  html {
+    background: var(--ground);
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100svh;
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--fill);
+    outline-offset: 4px;
+    border-radius: 3px;
+  }
+}
+
+/* how far the lens is through the html layer, the scene writes it every frame */
+@property --exit {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@layer components {
+  /* waits for the tail end of the flight, when the logo is already gone, then
+     comes toward you. reading --exit means a direct load is already at 1 and
+     the form is simply there, with nothing to wait for */
+  .auth-in {
+    --enter: clamp(0, calc((var(--exit) - 0.78) / 0.22), 1);
+    opacity: var(--enter);
+    transform: scale(calc(1 + 0.12 * (1 - var(--enter))));
+  }
+}
+
+@layer components {
+  /* the live marker. the core holds a steady pulse and a ring goes out from
+     under it, which is what reads as a signal rather than a blinking light */
+  .beat {
+    position: relative;
+    display: inline-block;
+    width: 0.34em;
+    height: 0.34em;
+    border-radius: var(--radius-pill);
+    background: var(--beat, currentColor);
+    vertical-align: 0.08em;
+    animation: beat-core 2.4s ease-in-out infinite;
+  }
+
+  .beat::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    animation: beat-ring 2.4s ease-out infinite;
+  }
+
+  @keyframes beat-core {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    55% {
+      opacity: 0.45;
+    }
+  }
+
+  @keyframes beat-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    70%,
+    100% {
+      transform: scale(3.4);
+      opacity: 0;
+    }
+  }
+
+  /* and the tail, running one dot at a time so the line reads as still going */
+  .beat-tick {
+    animation: beat-tick 2.4s ease-in-out infinite;
+  }
+
+  @keyframes beat-tick {
+    0%,
+    55%,
+    100% {
+      opacity: 0.22;
+    }
+    28% {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat,
+    .beat::after,
+    .beat-tick {
+      animation: none;
+    }
+    .beat::after {
+      opacity: 0;
+    }
+  }
+}
