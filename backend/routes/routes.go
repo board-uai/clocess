@@ -53,19 +53,19 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 	// file/[endpoint]
 	Group(api, "/file", func(r *echo.Group) {
 		r.GET("/get_all", func(c *echo.Context) error {
-			return files.GetAllUserFiles(c, logger, redis)
+			return files.GetAllUserFiles(c, logger, redis, masterKey)
 		})
 
 		r.POST("/delete", func(c *echo.Context) error {
-			return files.DeleteFile(c, logger, redis, storage)
+			return files.DeleteFile(c, logger, redis, storage, masterKey)
 		})
 
 		r.POST("/upload", func(c *echo.Context) error {
-			return files.UploadUserFile(c, logger, redis, storage)
+			return files.UploadUserFile(c, logger, redis, storage, masterKey)
 		})
 
 		r.GET("/download", func(c *echo.Context) error {
-			return files.DownloadUserFile(c, logger, redis, storage)
+			return files.DownloadUserFile(c, logger, redis, storage, masterKey)
 		})
 	})
 

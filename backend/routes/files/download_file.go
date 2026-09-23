@@ -29,7 +29,7 @@ var quoteEscaper = strings.NewReplacer(`\`, `\\`, `"`, `\"`)
 // @Failure      401  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
 // @Router       /file/download [get]
-func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage) error {
+func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage, masterKey []byte) error {
 	var downloadFileData downloadFileDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
@@ -51,7 +51,11 @@ func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Clie
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get filename name of fileID")
 	}
 
-	file, err := s.Read(int(userID), int(downloadFileData.FileID), filename)
+	remoteConnectionInfo := storage.RemoteConnection{
+		UserID: userID,
+		// continue on remote info
+	}
+	file, err := s.Read(remoteConnectionInfo, int(downloadFileData.FileID), filename)
 	if err != nil {
 		logger.Err(err).Int32("file_id", downloadFileData.FileID).Msg("failed to get file")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get file")
