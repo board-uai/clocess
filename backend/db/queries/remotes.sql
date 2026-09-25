@@ -18,7 +18,7 @@ SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1;
 -- name: GetRemoteById :one
 SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 AND id = $2;
 
-
+-- name: GetServerFingerPrints :one
 SELECT id, host_key_fingerprint FROM remotes WHERE user_id = $1 AND id = $2;
 
 -- name: GetServerConnectionInfo :many

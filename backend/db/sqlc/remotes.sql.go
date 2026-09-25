@@ -210,3 +210,24 @@ func (q *Queries) GetServerConnectionInfo(ctx context.Context, id int32) ([]GetS
 	}
 	return items, nil
 }
+
+const getServerFingerPrints = `-- name: GetServerFingerPrints :one
+SELECT id, host_key_fingerprint FROM remotes WHERE user_id = $1 AND id = $2
+`
+
+type GetServerFingerPrintsParams struct {
+	UserID int32 `json:"user_id"`
+	ID     int32 `json:"id"`
+}
+
+type GetServerFingerPrintsRow struct {
+	ID                 int32       `json:"id"`
+	HostKeyFingerprint pgtype.Text `json:"host_key_fingerprint"`
+}
+
+func (q *Queries) GetServerFingerPrints(ctx context.Context, arg GetServerFingerPrintsParams) (GetServerFingerPrintsRow, error) {
+	row := q.db.QueryRow(ctx, getServerFingerPrints, arg.UserID, arg.ID)
+	var i GetServerFingerPrintsRow
+	err := row.Scan(&i.ID, &i.HostKeyFingerprint)
+	return i, err
+}

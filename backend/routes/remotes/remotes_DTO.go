@@ -7,3 +7,7 @@ type AddRemoteDTO struct {
 	BasePath  string `json:"base_path"`
 	PublicKey string `json:"public_key"`
 }
+
+type RemoteStatusDTO struct {
+	RemoteID int32 `json:"remote_id"`
+}
