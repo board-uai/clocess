@@ -22,7 +22,7 @@ import (
 // @Failure      401  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
 // @Router       /file/delete [post]
-func DeleteFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage) error {
+func DeleteFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage, masterKey []byte) error {
 	var deleteFileRequest deleteFileDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
@@ -45,7 +45,23 @@ func DeleteFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s 
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get filename name of fileID")
 	}
 
-	if err := s.DeleteFile(int(userID), int(deleteFileRequest.FileID), filename); err != nil {
+	remoteInfo, err := queries.GetServerConnectionInfo(ctx, deleteFileRequest.RemoteID)
+	if err != nil {
+		return nil
+	}
+
+	remoteConnectionInfo := storage.RemoteConnection{
+		UserID:           userID,
+		RemoteID:         deleteFileRequest.RemoteID,
+		RemoteHost:       remoteInfo[0].Host,
+		RemotePort:       remoteInfo[0].Port,
+		RemoteUsername:   remoteInfo[0].Username,
+		RemoteBasePath:   remoteInfo[0].BasePath,
+		RemotePrivKey:    remoteInfo[0].EncryptedPrivateKey,
+		RemoteKeyVersion: remoteInfo[0].KeyVersion,
+	}
+
+	if err := s.DeleteFile(remoteConnectionInfo, int(deleteFileRequest.FileID), filename); err != nil {
 		logger.Err(err).Int32("file_id", deleteFileRequest.FileID).Msg("failed to delete file from disk")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete file")
 	}

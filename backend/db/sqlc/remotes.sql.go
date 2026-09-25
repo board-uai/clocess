@@ -99,6 +99,36 @@ func (q *Queries) GetAllUserRemotes(ctx context.Context, userID int32) ([]GetAll
 	return items, nil
 }
 
+const getRemoteById = `-- name: GetRemoteById :one
+SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 AND id = $2
+`
+
+type GetRemoteByIdParams struct {
+	UserID int32 `json:"user_id"`
+	ID     int32 `json:"id"`
+}
+
+type GetRemoteByIdRow struct {
+	ID       int32  `json:"id"`
+	Host     string `json:"host"`
+	Port     int32  `json:"port"`
+	Username string `json:"username"`
+	BasePath string `json:"base_path"`
+}
+
+func (q *Queries) GetRemoteById(ctx context.Context, arg GetRemoteByIdParams) (GetRemoteByIdRow, error) {
+	row := q.db.QueryRow(ctx, getRemoteById, arg.UserID, arg.ID)
+	var i GetRemoteByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Host,
+		&i.Port,
+		&i.Username,
+		&i.BasePath,
+	)
+	return i, err
+}
+
 const getRemoteSecret = `-- name: GetRemoteSecret :many
 SELECT remote_id, encrypted_private_key, key_version FROM remote_secrets where remote_id = $1
 `
@@ -127,4 +157,77 @@ func (q *Queries) GetRemoteSecret(ctx context.Context, remoteID pgtype.Int4) ([]
 		return nil, err
 	}
 	return items, nil
+}
+
+const getServerConnectionInfo = `-- name: GetServerConnectionInfo :many
+SELECT 
+    remotes.id, 
+    remotes.host, 
+    remotes.port, 
+    remotes.username, 
+    remotes.base_path,
+    remote_secrets.encrypted_private_key, 
+    remote_secrets.key_version 
+FROM remotes
+INNER JOIN remote_secrets 
+    ON remotes.id = $1
+`
+
+type GetServerConnectionInfoRow struct {
+	ID                  int32  `json:"id"`
+	Host                string `json:"host"`
+	Port                int32  `json:"port"`
+	Username            string `json:"username"`
+	BasePath            string `json:"base_path"`
+	EncryptedPrivateKey []byte `json:"encrypted_private_key"`
+	KeyVersion          int16  `json:"key_version"`
+}
+
+func (q *Queries) GetServerConnectionInfo(ctx context.Context, id int32) ([]GetServerConnectionInfoRow, error) {
+	rows, err := q.db.Query(ctx, getServerConnectionInfo, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetServerConnectionInfoRow
+	for rows.Next() {
+		var i GetServerConnectionInfoRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Host,
+			&i.Port,
+			&i.Username,
+			&i.BasePath,
+			&i.EncryptedPrivateKey,
+			&i.KeyVersion,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getServerFingerPrints = `-- name: GetServerFingerPrints :one
+SELECT id, host_key_fingerprint FROM remotes WHERE user_id = $1 AND id = $2
+`
+
+type GetServerFingerPrintsParams struct {
+	UserID int32 `json:"user_id"`
+	ID     int32 `json:"id"`
+}
+
+type GetServerFingerPrintsRow struct {
+	ID                 int32       `json:"id"`
+	HostKeyFingerprint pgtype.Text `json:"host_key_fingerprint"`
+}
+
+func (q *Queries) GetServerFingerPrints(ctx context.Context, arg GetServerFingerPrintsParams) (GetServerFingerPrintsRow, error) {
+	row := q.db.QueryRow(ctx, getServerFingerPrints, arg.UserID, arg.ID)
+	var i GetServerFingerPrintsRow
+	err := row.Scan(&i.ID, &i.HostKeyFingerprint)
+	return i, err
 }

@@ -14,3 +14,22 @@ INSERT into remotes(user_id, host, port, username, base_path, public_key, host_k
 
 -- name: GetAllUserRemotes :many
 SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1;
+
+-- name: GetRemoteById :one
+SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 AND id = $2;
+
+-- name: GetServerFingerPrints :one
+SELECT id, host_key_fingerprint FROM remotes WHERE user_id = $1 AND id = $2;
+
+-- name: GetServerConnectionInfo :many
+SELECT 
+    remotes.id, 
+    remotes.host, 
+    remotes.port, 
+    remotes.username, 
+    remotes.base_path,
+    remote_secrets.encrypted_private_key, 
+    remote_secrets.key_version 
+FROM remotes
+INNER JOIN remote_secrets 
+    ON remotes.id = $1;
