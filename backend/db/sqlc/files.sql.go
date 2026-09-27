@@ -138,6 +138,23 @@ func (q *Queries) GetFileName(ctx context.Context, arg GetFileNameParams) (strin
 	return filename, err
 }
 
+const getFileRemote = `-- name: GetFileRemote :one
+select remote_id from files where id=$1 and user_id = $2 and filename = $3
+`
+
+type GetFileRemoteParams struct {
+	ID       int32  `json:"id"`
+	UserID   int32  `json:"user_id"`
+	Filename string `json:"filename"`
+}
+
+func (q *Queries) GetFileRemote(ctx context.Context, arg GetFileRemoteParams) (int32, error) {
+	row := q.db.QueryRow(ctx, getFileRemote, arg.ID, arg.UserID, arg.Filename)
+	var remote_id int32
+	err := row.Scan(&remote_id)
+	return remote_id, err
+}
+
 const getNextFileID = `-- name: GetNextFileID :one
 select nextval('files_id_seq')::int
 `

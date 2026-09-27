@@ -50,17 +50,19 @@ get-files:
 upload:
 	curl -s -b $(COOKIE_JAR) -X POST $(BASE_URL)/file/upload \
 		-F "file=@$(FILE)" \
-		-F "server_host=$(SERVER_ID)" \
+		-F "remote_id=$(REMOTE_ID)" \
 		-w "\nHTTP %{http_code}\n"
 
 delete:
 	curl -s -b $(COOKIE_JAR) -X POST $(BASE_URL)/file/delete \
 		-H "Content-Type: application/json" \
-		-d '{"file_id":$(FILE_ID)}' \
+		-d '{"file_id":$(FILE_ID),"file_name":"$(FILE_NAME)"}' \
 		-w "\nHTTP %{http_code}\n"
 
 download:
-	curl -s -b $(COOKIE_JAR) "$(BASE_URL)/file/download?file_id=$(FILE_ID)" \
+	curl -s -b $(COOKIE_JAR) -G "$(BASE_URL)/file/download" \
+		--data-urlencode "file_id=$(FILE_ID)" \
+		--data-urlencode "file_name=$(FILE_NAME)" \
 		-o $(OUT) \
 		-w "\nHTTP %{http_code}\n"
 

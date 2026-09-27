@@ -22,10 +22,12 @@ import (
 // @Tags         files
 // @Accept       multipart/form-data
 // @Produce      json
-// @Param        file  formData  file  true  "file to upload"
+// @Param        file       formData  file  true  "file to upload"
+// @Param        remote_id  formData  int   true  "target remote id"
 // @Success      200   {object}  map[string]any
 // @Failure      400   {object}  map[string]string
 // @Failure      401   {object}  map[string]string
+// @Failure      403   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
 // @Router       /file/upload [post]
 func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage, masterKey []byte) error {

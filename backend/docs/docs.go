@@ -26,7 +26,7 @@ const docTemplate = `{
                 "summary": "Delete a file",
                 "parameters": [
                     {
-                        "description": "file_id",
+                        "description": "file_id and file_name",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -50,6 +50,15 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -85,6 +94,13 @@ const docTemplate = `{
                         "name": "file_id",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "file name",
+                        "name": "file_name",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -105,6 +121,15 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -181,6 +206,13 @@ const docTemplate = `{
                         "name": "file",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "target remote id",
+                        "name": "remote_id",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -202,6 +234,15 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -668,6 +709,9 @@ const docTemplate = `{
             "properties": {
                 "file_id": {
                     "type": "integer"
+                },
+                "file_name": {
+                    "type": "string"
                 }
             }
         },

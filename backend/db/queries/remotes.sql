@@ -21,15 +21,16 @@ SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 AND i
 -- name: GetServerFingerPrints :one
 SELECT id, host_key_fingerprint FROM remotes WHERE user_id = $1 AND id = $2;
 
--- name: GetServerConnectionInfo :many
-SELECT 
-    remotes.id, 
-    remotes.host, 
-    remotes.port, 
-    remotes.username, 
+-- name: GetRemoteConnection :one
+SELECT
+    remotes.id,
+    remotes.host,
+    remotes.port,
+    remotes.username,
     remotes.base_path,
-    remote_secrets.encrypted_private_key, 
-    remote_secrets.key_version 
+    remote_secrets.encrypted_private_key,
+    remote_secrets.key_version
 FROM remotes
-INNER JOIN remote_secrets 
-    ON remotes.id = $1;
+INNER JOIN remote_secrets
+    ON remote_secrets.remote_id = remotes.id
+WHERE remotes.id = $1 AND remotes.user_id = $2;

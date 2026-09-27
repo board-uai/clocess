@@ -12,6 +12,9 @@ returning filename;
 -- name: GetFileName :one
 select filename from files where id = $1 and user_id = $2 and remote_id = $3;
 
+-- name: GetFileRemote :one
+select remote_id from files where id=$1 and user_id = $2 and filename = $3;
+
 -- name: GetNextFileID :one
 select nextval('files_id_seq')::int;
 

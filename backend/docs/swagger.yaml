@@ -11,6 +11,8 @@ definitions:
     properties:
       file_id:
         type: integer
+      file_name:
+        type: string
     type: object
   remotes.AddRemoteDTO:
     properties:
@@ -43,7 +45,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: file_id
+      - description: file_id and file_name
         in: body
         name: body
         required: true
@@ -60,6 +62,12 @@ paths:
             type: object
         "401":
           description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
           schema:
             additionalProperties:
               type: string
@@ -81,6 +89,11 @@ paths:
         name: file_id
         required: true
         type: integer
+      - description: file name
+        in: query
+        name: file_name
+        required: true
+        type: string
       produces:
       - application/octet-stream
       responses:
@@ -96,6 +109,12 @@ paths:
             type: object
         "401":
           description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
           schema:
             additionalProperties:
               type: string
@@ -144,6 +163,11 @@ paths:
         name: file
         required: true
         type: file
+      - description: target remote id
+        in: formData
+        name: remote_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -160,6 +184,12 @@ paths:
             type: object
         "401":
           description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
           schema:
             additionalProperties:
               type: string

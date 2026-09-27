@@ -35,7 +35,10 @@ func RemoteStatus(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, 
 		return nil
 	}
 
-	remoteInfo, err := queries.GetServerConnectionInfo(ctx, remoteStatusInfo.RemoteID)
+	remoteInfo, err := queries.GetRemoteConnection(ctx, sqlc.GetRemoteConnectionParams{
+		ID:     remoteStatusInfo.RemoteID,
+		UserID: userID,
+	})
 	if err != nil {
 		return nil
 	}
@@ -43,15 +46,15 @@ func RemoteStatus(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, 
 	remoteConnectionInfo := storage.RemoteConnection{
 		UserID:           userID,
 		RemoteID:         remoteStatusInfo.RemoteID,
-		RemoteHost:       remoteInfo[0].Host,
-		RemotePort:       remoteInfo[0].Port,
-		RemoteUsername:   remoteInfo[0].Username,
-		RemoteBasePath:   remoteInfo[0].BasePath,
-		RemotePrivKey:    remoteInfo[0].EncryptedPrivateKey,
-		RemoteKeyVersion: remoteInfo[0].KeyVersion,
+		RemoteHost:       remoteInfo.Host,
+		RemotePort:       remoteInfo.Port,
+		RemoteUsername:   remoteInfo.Username,
+		RemoteBasePath:   remoteInfo.BasePath,
+		RemotePrivKey:    remoteInfo.EncryptedPrivateKey,
+		RemoteKeyVersion: remoteInfo.KeyVersion,
 	}
 
-	if err := utils.RemoteStatusCheck(&remoteConnectionInfo, logger, remoteInfo[0].EncryptedPrivateKey, fingerPrints.HostKeyFingerprint.String); err != nil {
+	if err := utils.RemoteStatusCheck(&remoteConnectionInfo, logger, remoteInfo.EncryptedPrivateKey, fingerPrints.HostKeyFingerprint.String); err != nil {
 		return nil
 	}
 	return c.JSON(http.StatusOK, "PONG")
