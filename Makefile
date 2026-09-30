@@ -15,3 +15,13 @@ migrate-create:
 
 migrate-status:
 	goose -dir backend/db/migrations postgres "$(DB_URL)" status
+
+
+app-up:
+	docker compose up -d 
+
+app-down:
+	docker compose down
+
+app-build:
+	docker compose up -d --build
