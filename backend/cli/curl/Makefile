@@ -43,7 +43,7 @@ deactivate:
 		-w "\nHTTP %{http_code}\n"
 
 
-list:
+get-files:
 	curl -s -b $(COOKIE_JAR) $(BASE_URL)/file/get_all \
 		-w "\nHTTP %{http_code}\n"
 
