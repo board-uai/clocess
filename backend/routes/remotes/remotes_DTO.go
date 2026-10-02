@@ -12,3 +12,7 @@ type SetUpRemoteDTO struct {
 	BasePath    string `json:"base_path"`
 	MemoryLimit int32  `json:"memory_limit"`
 }
+
+type DeleteUserRemoteDTO struct {
+	RemoteId int32 `json:"remote_id"`
+}

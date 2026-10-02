@@ -67,6 +67,21 @@ get-key:
 	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/get_key \
 		-w "\nHTTP %{http_code}\n"
 
+
+deactivate-remote:
+	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/deactivate \
+		-H "Content-Type: application/json" \
+		-d '{"remote_id":$(REMOTE_ID)}' \
+		-w "\nHTTP %{http_code}\n"
+
+delete-remote:
+	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/delete \
+		-H "Content-Type: application/json" \
+		-d '{"remote_id":$(REMOTE_ID)}' \
+		-w "\nHTTP %{http_code}\n"
+
+
+
 get-remotes:
 	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/get_remotes \
 		-w "\nHTTP %{http_code}\n"
