@@ -25,6 +25,11 @@ definitions:
       public_key:
         type: string
     type: object
+  remotes.RemoteIDDTO:
+    properties:
+      remote_id:
+        type: integer
+    type: object
   settings.changeUserPasswordDTO:
     properties:
       old_password:
@@ -213,6 +218,94 @@ paths:
               type: string
             type: object
       summary: Add a remote server (SSH/SFTP) for the current user
+      tags:
+      - remotes
+  /remote/deactivate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: remote_id
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/remotes.RemoteIDDTO'
+      responses:
+        "200":
+          description: remote deactivated
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: invalid session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deactivate a remote and drop its stored private key
+      tags:
+      - remotes
+  /remote/delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: remote_id
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/remotes.RemoteIDDTO'
+      responses:
+        "200":
+          description: remote deleted
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: invalid session
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: remote still has files
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a remote and its stored private key
       tags:
       - remotes
   /remote/get_key:

@@ -61,15 +61,16 @@ func (q *Queries) CreateRemoteSecret(ctx context.Context, arg CreateRemoteSecret
 	return id, err
 }
 
-const deactivateUserRemote = `-- name: DeactivateUserRemote :exec
-WITH deactivated_remote AS (
-    UPDATE remotes 
-    SET active = false 
-    WHERE remotes.id = $1 AND remotes.user_id = $2
-    RETURNING remotes.id AS cte_id
+const deactivateUserRemote = `-- name: DeactivateUserRemote :execrows
+WITH deleted_secret AS (
+    DELETE FROM remote_secrets
+    WHERE remote_secrets.remote_id IN (
+        SELECT remotes.id FROM remotes WHERE remotes.id = $1 AND remotes.user_id = $2
+    )
 )
-DELETE FROM remote_secrets 
-WHERE remote_secrets.remote_id IN (SELECT cte_id FROM deactivated_remote)
+UPDATE remotes
+SET active = false
+WHERE remotes.id = $1 AND remotes.user_id = $2
 `
 
 type DeactivateUserRemoteParams struct {
@@ -77,22 +78,16 @@ type DeactivateUserRemoteParams struct {
 	UserID int32 `json:"user_id"`
 }
 
-func (q *Queries) DeactivateUserRemote(ctx context.Context, arg DeactivateUserRemoteParams) error {
-	_, err := q.db.Exec(ctx, deactivateUserRemote, arg.ID, arg.UserID)
-	return err
+func (q *Queries) DeactivateUserRemote(ctx context.Context, arg DeactivateUserRemoteParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deactivateUserRemote, arg.ID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
-const deleteUserRemote = `-- name: DeleteUserRemote :exec
-WITH target_remote AS (
-    SELECT remotes.id AS cte_id FROM remotes 
-    WHERE remotes.id = $1 AND remotes.user_id = $2
-)
-, deleted_secret AS (
-    DELETE FROM remote_secrets 
-    WHERE remote_secrets.remote_id IN (SELECT cte_id FROM target_remote)
-)
-DELETE FROM remotes 
-WHERE remotes.id IN (SELECT cte_id FROM target_remote)
+const deleteUserRemote = `-- name: DeleteUserRemote :execrows
+DELETE FROM remotes WHERE id = $1 AND user_id = $2
 `
 
 type DeleteUserRemoteParams struct {
@@ -100,9 +95,12 @@ type DeleteUserRemoteParams struct {
 	UserID int32 `json:"user_id"`
 }
 
-func (q *Queries) DeleteUserRemote(ctx context.Context, arg DeleteUserRemoteParams) error {
-	_, err := q.db.Exec(ctx, deleteUserRemote, arg.ID, arg.UserID)
-	return err
+func (q *Queries) DeleteUserRemote(ctx context.Context, arg DeleteUserRemoteParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteUserRemote, arg.ID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }
 
 const getAllUserRemotes = `-- name: GetAllUserRemotes :many

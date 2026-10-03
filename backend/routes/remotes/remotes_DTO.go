@@ -13,6 +13,6 @@ type SetUpRemoteDTO struct {
 	MemoryLimit int32  `json:"memory_limit"`
 }
 
-type DeleteUserRemoteDTO struct {
-	RemoteId int32 `json:"remote_id"`
+type RemoteIDDTO struct {
+	RemoteID int32 `json:"remote_id"`
 }

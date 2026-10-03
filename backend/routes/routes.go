@@ -87,10 +87,6 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 			return remotes.AddUserRemote(c, logger, redis, masterKey)
 		})
 
-		r.POST("/delete_remote", func(c *echo.Context) error {
-			return remotes.DeleteRemote(c, logger, redis)
-		})
-
 		r.POST("/edit_remote", func(c *echo.Context) error {
 			return remotes.EditRemoteData(c, logger, redis)
 		})

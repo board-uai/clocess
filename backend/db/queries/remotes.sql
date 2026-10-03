@@ -18,26 +18,16 @@ SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 and a
 -- name: GetAllUserRemotes :many
 SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1;
 
-
--- name: DeactivateUserRemote :exec
-WITH deactivated_remote AS (
-    UPDATE remotes 
-    SET active = false 
-    WHERE remotes.id = $1 AND remotes.user_id = $2
-    RETURNING remotes.id AS cte_id
+-- name: DeactivateUserRemote :execrows
+WITH deleted_secret AS (
+    DELETE FROM remote_secrets
+    WHERE remote_secrets.remote_id IN (
+        SELECT remotes.id FROM remotes WHERE remotes.id = $1 AND remotes.user_id = $2
+    )
 )
-DELETE FROM remote_secrets 
-WHERE remote_secrets.remote_id IN (SELECT cte_id FROM deactivated_remote);
+UPDATE remotes
+SET active = false
+WHERE remotes.id = $1 AND remotes.user_id = $2;
 
-
--- name: DeleteUserRemote :exec
-WITH target_remote AS (
-    SELECT remotes.id AS cte_id FROM remotes 
-    WHERE remotes.id = $1 AND remotes.user_id = $2
-)
-, deleted_secret AS (
-    DELETE FROM remote_secrets 
-    WHERE remote_secrets.remote_id IN (SELECT cte_id FROM target_remote)
-)
-DELETE FROM remotes 
-WHERE remotes.id IN (SELECT cte_id FROM target_remote);
+-- name: DeleteUserRemote :execrows
+DELETE FROM remotes WHERE id = $1 AND user_id = $2;
