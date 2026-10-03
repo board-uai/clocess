@@ -1,6 +1,7 @@
 package remotes
 
 import (
+	"errors"
 	"net"
 	"path"
 	"strconv"
@@ -10,15 +11,16 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// CheckRemote does first-connect verification for a brand new remote: SSH
-// auth, TOFU host-key capture (nothing to compare against yet, so any key is
-// accepted and its fingerprint returned for the caller to persist), and a
-// write/remove probe under BasePath to confirm it's actually writable.
+var ErrHostKeyMismatch = errors.New("host key mismatch")
+
+// CheckRemote does SSH auth, host-key verification, and a write/remove probe
+// under BasePath to confirm it's actually writable.
 //
-// Reconnect (verifying against an *already-stored* fingerprint once a remote
-// exists) is a separate, not-yet-written code path — do not reuse this func
-// for that; it always trusts the first key it sees.
-func CheckRemote(remoteContext *AddRemoteDTO, logger *zerolog.Logger, privateKey []byte) (fingerprint string, err error) {
+// expectedFingerprint == "" is TOFU for a brand new remote: any key is accepted
+// and its fingerprint returned for the caller to persist. Only add_remote may
+// pass "". For an existing remote pass the stored fingerprint; a different host
+// key fails with ErrHostKeyMismatch.
+func CheckRemote(remoteContext *AddRemoteDTO, logger *zerolog.Logger, privateKey []byte, expectedFingerprint string) (fingerprint string, err error) {
 	signer, err := ssh.ParsePrivateKey(privateKey)
 	if err != nil {
 		logger.Err(err).Msg("failed to parse private Key")
@@ -30,7 +32,10 @@ func CheckRemote(remoteContext *AddRemoteDTO, logger *zerolog.Logger, privateKey
 		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			fingerprint = ssh.FingerprintSHA256(key)
-			return nil // TOFU: first connect, nothing to compare against yet
+			if expectedFingerprint != "" && fingerprint != expectedFingerprint {
+				return ErrHostKeyMismatch
+			}
+			return nil
 		},
 	}
 

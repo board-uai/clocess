@@ -1,6 +1,7 @@
 package files
 
 import (
+	"errors"
 	"fmt"
 	"mime"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/board-uai/clocess/storage"
 
 	"github.com/board-uai/clocess/cache"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
@@ -27,9 +29,11 @@ var quoteEscaper = strings.NewReplacer(`\`, `\\`, `"`, `\"`)
 // @Success      200  {file}  file
 // @Failure      400  {object}  map[string]string
 // @Failure      401  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Failure      409  {object}  map[string]string  "file's remote has no stored key"
 // @Failure      500  {object}  map[string]string
 // @Router       /file/download [get]
-func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage) error {
+func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage, masterKey []byte) error {
 	var downloadFileData downloadFileDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
@@ -42,16 +46,32 @@ func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Clie
 	}
 
 	queries := sqlc.New(db.Pool)
-	filename, err := queries.GetFileName(ctx, sqlc.GetFileNameParams{
+	userFile, err := queries.GetUserFile(ctx, sqlc.GetUserFileParams{
 		ID:     downloadFileData.FileID,
 		UserID: userID,
 	})
 	if err != nil {
-		logger.Err(err).Int32("file_id", downloadFileData.FileID).Msg("failed to get filename name of fileID")
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get filename name of fileID")
+		if errors.Is(err, pgx.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound, "file not found")
+		}
+		logger.Err(err).Int32("file_id", downloadFileData.FileID).Msg("failed to get file")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get file")
+	}
+	filename := userFile.Filename
+
+	remoteInfo, err := queries.GetRemoteConnection(ctx, sqlc.GetRemoteConnectionParams{
+		ID:     userFile.RemoteID,
+		UserID: userID,
+	})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusConflict, "file's remote has no stored key")
+		}
+		logger.Err(err).Int32("remote_id", userFile.RemoteID).Msg("failed to get remote connection info")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get remote connection info")
 	}
 
-	file, err := s.Read(int(userID), int(downloadFileData.FileID), filename)
+	file, err := s.Read(storage.NewRemoteConnection(userID, remoteInfo), int(downloadFileData.FileID), filename)
 	if err != nil {
 		logger.Err(err).Int32("file_id", downloadFileData.FileID).Msg("failed to get file")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get file")

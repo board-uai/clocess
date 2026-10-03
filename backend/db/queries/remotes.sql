@@ -18,6 +18,21 @@ SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 and a
 -- name: GetAllUserRemotes :many
 SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1;
 
+-- name: GetRemoteConnection :one
+SELECT
+    remotes.id,
+    remotes.host,
+    remotes.port,
+    remotes.username,
+    remotes.base_path,
+    remotes.host_key_fingerprint,
+    remote_secrets.encrypted_private_key,
+    remote_secrets.key_version
+FROM remotes
+INNER JOIN remote_secrets
+    ON remote_secrets.remote_id = remotes.id
+WHERE remotes.id = $1 AND remotes.user_id = $2;
+
 -- name: DeactivateUserRemote :execrows
 WITH deleted_secret AS (
     DELETE FROM remote_secrets

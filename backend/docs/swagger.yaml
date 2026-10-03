@@ -69,6 +69,18 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: file's remote has no stored key
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -101,6 +113,18 @@ paths:
             type: object
         "401":
           description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: file's remote has no stored key
           schema:
             additionalProperties:
               type: string
@@ -149,6 +173,11 @@ paths:
         name: file
         required: true
         type: file
+      - description: target remote id
+        in: formData
+        name: remote_id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -165,6 +194,12 @@ paths:
             type: object
         "401":
           description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden
           schema:
             additionalProperties:
               type: string

@@ -50,6 +50,7 @@ get-files:
 upload:
 	curl -s -b $(COOKIE_JAR) -X POST $(BASE_URL)/file/upload \
 		-F "file=@$(FILE)" \
+		-F "remote_id=$(REMOTE_ID)" \
 		-w "\nHTTP %{http_code}\n"
 
 delete:
