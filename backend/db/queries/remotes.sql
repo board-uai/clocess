@@ -12,5 +12,22 @@ INSERT into remotes(user_id, host, port, username, base_path, public_key, host_k
   values ($1, $2, $3, $4, $5, $6, $7)
   returning id;
 
+-- name: GetUserRemotes :many
+SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 and active=true;
+
 -- name: GetAllUserRemotes :many
 SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1;
+
+-- name: DeactivateUserRemote :execrows
+WITH deleted_secret AS (
+    DELETE FROM remote_secrets
+    WHERE remote_secrets.remote_id IN (
+        SELECT remotes.id FROM remotes WHERE remotes.id = $1 AND remotes.user_id = $2
+    )
+)
+UPDATE remotes
+SET active = false
+WHERE remotes.id = $1 AND remotes.user_id = $2;
+
+-- name: DeleteUserRemote :execrows
+DELETE FROM remotes WHERE id = $1 AND user_id = $2;
