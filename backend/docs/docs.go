@@ -26,7 +26,7 @@ const docTemplate = `{
                 "summary": "Delete a file",
                 "parameters": [
                     {
-                        "description": "file_id and file_name",
+                        "description": "file_id",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -66,6 +66,15 @@ const docTemplate = `{
                             }
                         }
                     },
+                    "409": {
+                        "description": "file's remote has no stored key",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -92,13 +101,6 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "file id",
                         "name": "file_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "file name",
-                        "name": "file_name",
                         "in": "query",
                         "required": true
                     }
@@ -130,6 +132,15 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "file's remote has no stored key",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -709,9 +720,6 @@ const docTemplate = `{
             "properties": {
                 "file_id": {
                     "type": "integer"
-                },
-                "file_name": {
-                    "type": "string"
                 }
             }
         },

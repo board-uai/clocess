@@ -25,12 +25,12 @@ var quoteEscaper = strings.NewReplacer(`\`, `\\`, `"`, `\"`)
 // @Summary      Download a file
 // @Tags         files
 // @Produce      application/octet-stream
-// @Param        file_id    query  int     true  "file id"
-// @Param        file_name  query  string  true  "file name"
+// @Param        file_id  query  int  true  "file id"
 // @Success      200  {file}  file
 // @Failure      400  {object}  map[string]string
 // @Failure      401  {object}  map[string]string
 // @Failure      404  {object}  map[string]string
+// @Failure      409  {object}  map[string]string  "file's remote has no stored key"
 // @Failure      500  {object}  map[string]string
 // @Router       /file/download [get]
 func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, s *storage.Storage, masterKey []byte) error {
@@ -46,49 +46,32 @@ func DownloadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Clie
 	}
 
 	queries := sqlc.New(db.Pool)
-	remoteID, err := queries.GetFileRemote(ctx, sqlc.GetFileRemoteParams{
-		ID:       downloadFileData.FileID,
-		UserID:   userID,
-		Filename: downloadFileData.Filename,
+	userFile, err := queries.GetUserFile(ctx, sqlc.GetUserFileParams{
+		ID:     downloadFileData.FileID,
+		UserID: userID,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return echo.NewHTTPError(http.StatusNotFound, "file not found")
 		}
-		logger.Err(err).Msg("failed to find remoteID by request")
-		return echo.NewHTTPError(http.StatusInternalServerError, "internalServerError")
+		logger.Err(err).Int32("file_id", downloadFileData.FileID).Msg("failed to get file")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get file")
 	}
-
-	filename, err := queries.GetFileName(ctx, sqlc.GetFileNameParams{
-		ID:       downloadFileData.FileID,
-		UserID:   userID,
-		RemoteID: remoteID,
-	})
-	if err != nil {
-		logger.Err(err).Int32("file_id", downloadFileData.FileID).Msg("failed to get filename name of fileID")
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get filename name of fileID")
-	}
+	filename := userFile.Filename
 
 	remoteInfo, err := queries.GetRemoteConnection(ctx, sqlc.GetRemoteConnectionParams{
-		ID:     remoteID,
+		ID:     userFile.RemoteID,
 		UserID: userID,
 	})
 	if err != nil {
-		logger.Err(err).Int32("remote_id", remoteID).Msg("failed to get remote connection info")
+		if errors.Is(err, pgx.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusConflict, "file's remote has no stored key")
+		}
+		logger.Err(err).Int32("remote_id", userFile.RemoteID).Msg("failed to get remote connection info")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get remote connection info")
 	}
 
-	remoteConnectionInfo := storage.RemoteConnection{
-		UserID:           userID,
-		RemoteID:         remoteID,
-		RemoteHost:       remoteInfo.Host,
-		RemotePort:       remoteInfo.Port,
-		RemoteUsername:   remoteInfo.Username,
-		RemoteBasePath:   remoteInfo.BasePath,
-		RemotePrivKey:    remoteInfo.EncryptedPrivateKey,
-		RemoteKeyVersion: remoteInfo.KeyVersion,
-	}
-	file, err := s.Read(remoteConnectionInfo, int(downloadFileData.FileID), filename)
+	file, err := s.Read(storage.NewRemoteConnection(userID, remoteInfo), int(downloadFileData.FileID), filename)
 	if err != nil {
 		logger.Err(err).Int32("file_id", downloadFileData.FileID).Msg("failed to get file")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get file")

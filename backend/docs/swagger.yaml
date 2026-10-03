@@ -11,8 +11,6 @@ definitions:
     properties:
       file_id:
         type: integer
-      file_name:
-        type: string
     type: object
   remotes.AddRemoteDTO:
     properties:
@@ -45,7 +43,7 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: file_id and file_name
+      - description: file_id
         in: body
         name: body
         required: true
@@ -72,6 +70,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "409":
+          description: file's remote has no stored key
+          schema:
+            additionalProperties:
+              type: string
+            type: object
         "500":
           description: Internal Server Error
           schema:
@@ -89,11 +93,6 @@ paths:
         name: file_id
         required: true
         type: integer
-      - description: file name
-        in: query
-        name: file_name
-        required: true
-        type: string
       produces:
       - application/octet-stream
       responses:
@@ -115,6 +114,12 @@ paths:
             type: object
         "404":
           description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: file's remote has no stored key
           schema:
             additionalProperties:
               type: string

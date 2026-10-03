@@ -57,7 +57,7 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 	// file/[endpoint]
 	Group(api, "/file", func(r *echo.Group) {
 		r.GET("/get_all", func(c *echo.Context) error {
-			return files.GetAllUserFiles(c, logger, redis, masterKey)
+			return files.GetAllUserFiles(c, logger, redis)
 		})
 
 		r.POST("/delete", func(c *echo.Context) error {

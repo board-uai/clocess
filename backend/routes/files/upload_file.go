@@ -48,18 +48,17 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 	}
 
 	queries := sqlc.New(db.Pool)
-	// run verification to check whatever front end submitted remote id is valid for user
-
-	remoteData, err := queries.GetRemoteById(ctx, sqlc.GetRemoteByIdParams{
+	// verifies the remote belongs to the user and still has a key (deactivated remotes don't)
+	remoteInfo, err := queries.GetRemoteConnection(ctx, sqlc.GetRemoteConnectionParams{
+		ID:     fileUploadData.RemoteID,
 		UserID: userID,
-		ID:     fileUploadData.RemoteId,
 	})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			logger.Err(err).Int32("serverID", fileUploadData.RemoteId).Msg("user has no access to server")
+			logger.Err(err).Int32("serverID", fileUploadData.RemoteID).Msg("user has no access to server")
 			return echo.NewHTTPError(http.StatusForbidden, "forbidden")
 		}
-		logger.Err(err).Int32("serverID", fileUploadData.RemoteId).Msg("failed to verify user access to server")
+		logger.Err(err).Int32("serverID", fileUploadData.RemoteID).Msg("failed to verify user access to server")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to verify server access")
 	}
 
@@ -86,11 +85,7 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to analyze file_type")
 	}
 
-	remoteConnectionInfo := storage.RemoteConnection{
-		UserID: userID,
-		// continue on remote info
-	}
-	file_path, err := s.Save(remoteConnectionInfo, int(file_id), fileUploadData.File.Filename, src)
+	file_path, err := s.Save(storage.NewRemoteConnection(userID, remoteInfo), int(file_id), fileUploadData.File.Filename, src)
 	if err != nil {
 		logger.Err(err).Int32("file_id", file_id).Msg("failed to save file on server")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save file")
@@ -102,7 +97,7 @@ func UploadUserFile(c *echo.Context, logger *zerolog.Logger, redis *redis.Client
 		Filename: fileUploadData.File.Filename,
 		FileType: file_type,
 		DiskPath: file_path,
-		RemoteID: remoteData.ID,
+		RemoteID: remoteInfo.ID,
 	})
 	if err != nil {
 		logger.Err(err).Int32("file_id", file_id).Msg("failed to write record about new file")

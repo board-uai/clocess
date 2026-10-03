@@ -1,61 +1,70 @@
 package remotes
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/board-uai/clocess/cache"
 	"github.com/board-uai/clocess/db"
 	"github.com/board-uai/clocess/db/sqlc"
-	"github.com/board-uai/clocess/storage"
-	"github.com/board-uai/clocess/utils"
+	crypt "github.com/board-uai/clocess/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 )
 
-func RemoteStatus(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, remoteContext *AddRemoteDTO) error {
+func RemoteStatus(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, masterKey []byte) error {
+	var remoteStatusRequest RemoteStatusDTO
 	ctx := c.Request().Context()
-	var remoteStatusInfo *RemoteStatusDTO
-	if err := c.Bind(&remoteContext); err != nil {
-		logger.Err(err).Msg("Can't bind remote DTO")
+	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
+	if err != nil {
+		if errors.Is(err, cache.ErrSessionNotFound) {
+			return echo.NewHTTPError(http.StatusUnauthorized, "invalid session")
+		}
+		logger.Err(err).Msg("failed to find user session")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user session")
+	}
+	if err := c.Bind(&remoteStatusRequest); err != nil {
+		logger.Err(err).Msg("Can't bind remote_id")
 		return echo.NewHTTPError(http.StatusBadRequest, "bad request")
 	}
 
-	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
-	}
 	queries := sqlc.New(db.Pool)
-
-	fingerPrints, err := queries.GetServerFingerPrints(ctx, sqlc.GetServerFingerPrintsParams{
-		UserID: userID,
-		ID:     remoteStatusInfo.RemoteID,
-	})
-	if err != nil {
-		return nil
-	}
-
 	remoteInfo, err := queries.GetRemoteConnection(ctx, sqlc.GetRemoteConnectionParams{
-		ID:     remoteStatusInfo.RemoteID,
+		ID:     remoteStatusRequest.RemoteID,
 		UserID: userID,
 	})
 	if err != nil {
-		return nil
+		if errors.Is(err, pgx.ErrNoRows) {
+			return echo.NewHTTPError(http.StatusNotFound, "remote not found")
+		}
+		logger.Err(err).Int32("remote_id", remoteStatusRequest.RemoteID).Msg("failed to get remote connection info")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get remote connection info")
+	}
+	// an existing remote without a stored fingerprint is broken, never fall back to TOFU here
+	if remoteInfo.HostKeyFingerprint.String == "" {
+		logger.Error().Int32("remote_id", remoteInfo.ID).Msg("remote has no stored host key fingerprint")
+		return echo.NewHTTPError(http.StatusInternalServerError, "remote has no stored host key")
 	}
 
-	remoteConnectionInfo := storage.RemoteConnection{
-		UserID:           userID,
-		RemoteID:         remoteStatusInfo.RemoteID,
-		RemoteHost:       remoteInfo.Host,
-		RemotePort:       remoteInfo.Port,
-		RemoteUsername:   remoteInfo.Username,
-		RemoteBasePath:   remoteInfo.BasePath,
-		RemotePrivKey:    remoteInfo.EncryptedPrivateKey,
-		RemoteKeyVersion: remoteInfo.KeyVersion,
+	privateKey, err := crypt.DecryptMaster(masterKey, remoteInfo.EncryptedPrivateKey)
+	if err != nil {
+		logger.Err(err).Int32("remote_id", remoteInfo.ID).Msg("failed to decrypt private Key")
+		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	if err := utils.RemoteStatusCheck(&remoteConnectionInfo, logger, remoteInfo.EncryptedPrivateKey, fingerPrints.HostKeyFingerprint.String); err != nil {
-		return nil
+	if _, err := CheckRemote(&AddRemoteDTO{
+		Host:     remoteInfo.Host,
+		HostUser: remoteInfo.Username,
+		HostPort: remoteInfo.Port,
+		BasePath: remoteInfo.BasePath,
+	}, logger, privateKey, remoteInfo.HostKeyFingerprint.String); err != nil {
+		if errors.Is(err, ErrHostKeyMismatch) {
+			logger.Warn().Int32("remote_id", remoteInfo.ID).Msg("remote host key changed")
+			return echo.NewHTTPError(http.StatusForbidden, "remote host key changed")
+		}
+		return echo.NewHTTPError(http.StatusBadGateway, "remote unreachable")
 	}
-	return c.JSON(http.StatusOK, "PONG")
+	return c.NoContent(http.StatusOK)
 }

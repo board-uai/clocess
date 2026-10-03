@@ -2,18 +2,12 @@
 select id, filename, file_type from files where user_id = $1;
 
 
--- name: GetAllUserFileRemote :many
-SELECT id, filename, file_type from files where user_id = $1 and remote_id = $2; 
-
 -- name: DeleteFile :one
-delete from files where id = $1 and user_id = $2 and remote_id = $3
+delete from files where id = $1 and user_id = $2
 returning filename;
 
--- name: GetFileName :one
-select filename from files where id = $1 and user_id = $2 and remote_id = $3;
-
--- name: GetFileRemote :one
-select remote_id from files where id=$1 and user_id = $2 and filename = $3;
+-- name: GetUserFile :one
+select filename, remote_id from files where id = $1 and user_id = $2;
 
 -- name: GetNextFileID :one
 select nextval('files_id_seq')::int;
