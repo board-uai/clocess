@@ -28,6 +28,7 @@ type Remote struct {
 	PublicKey          string             `json:"public_key"`
 	HostKeyFingerprint pgtype.Text        `json:"host_key_fingerprint"`
 	CreatedAt          pgtype.Timestamptz `json:"created_at"`
+	Active             bool               `json:"active"`
 }
 
 type RemoteSecret struct {

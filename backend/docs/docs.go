@@ -338,6 +338,141 @@ const docTemplate = `{
                 }
             }
         },
+        "/remote/deactivate": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "remotes"
+                ],
+                "summary": "Deactivate a remote and drop its stored private key",
+                "parameters": [
+                    {
+                        "description": "remote_id",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/remotes.RemoteIDDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "remote deactivated"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "invalid session",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/remote/delete": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "remotes"
+                ],
+                "summary": "Delete a remote and its stored private key",
+                "parameters": [
+                    {
+                        "description": "remote_id",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/remotes.RemoteIDDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "remote deleted"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "invalid session",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "remote still has files",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/remote/get_key": {
             "get": {
                 "description": "Private key stays server-side and never leaves this handler as-is (see TODO below); client only ever gets the public key to paste into their server's authorized_keys.",
@@ -740,6 +875,14 @@ const docTemplate = `{
                 },
                 "public_key": {
                     "type": "string"
+                }
+            }
+        },
+        "remotes.RemoteIDDTO": {
+            "type": "object",
+            "properties": {
+                "remote_id": {
+                    "type": "integer"
                 }
             }
         },

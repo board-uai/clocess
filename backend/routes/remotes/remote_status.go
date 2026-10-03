@@ -15,7 +15,7 @@ import (
 )
 
 func RemoteStatus(c *echo.Context, logger *zerolog.Logger, redis *redis.Client, masterKey []byte) error {
-	var remoteStatusRequest RemoteStatusDTO
+	var remoteStatusRequest RemoteIDDTO
 	ctx := c.Request().Context()
 	userID, err := cache.GetUserIDFromSession(c, ctx, redis, logger)
 	if err != nil {

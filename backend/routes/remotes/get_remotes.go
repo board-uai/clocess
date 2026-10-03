@@ -32,7 +32,7 @@ func GetAllUserRemotes(c *echo.Context, logger *zerolog.Logger, redis *redis.Cli
 	}
 
 	queries := sqlc.New(db.Pool)
-	userRemotes, err := queries.GetAllUserRemotes(c.Request().Context(), userID)
+	userRemotes, err := queries.GetUserRemotes(c.Request().Context(), userID)
 	if err != nil {
 		logger.Err(err).Int32("userID", userID).Msg("failed to get user remotes")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get user remotes")
