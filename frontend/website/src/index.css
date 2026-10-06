@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@import "@clocess/shared/theme.css";
+
+@layer components {
+  /* thins out as the lens climbs past, on the flight's own clock */
+  .exit-fade {
+    opacity: calc(1 - var(--exit));
+  }
+
+  /* the other half of the same crossfade, arrives as the hero leaves */
+  .exit-in {
+    opacity: var(--exit);
+  }
+}
+
+/* the hero's own scroll, 0 at the top and 1 one screen down */
+@property --hero {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@layer components {
+  /**
+   * The panel under the wordmark leaves downward. The page is already carrying
+   * it up at 1:1, so this has to outrun that before the net movement is down at
+   * all — at 150svh the sum is 57svh + 50svh x --hero, which only ever grows.
+   * The lens takes the wordmark the other way, so the two part immediately
+   * instead of crossing over each other.
+   */
+  .hero-sink {
+    transform: translate3d(0, calc(var(--hero) * 150svh), 0);
+    opacity: clamp(0, calc(1 - var(--hero) * 1.6), 1);
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* no parallax: it just goes, and sooner, so it still clears the wordmark */
+    .hero-sink {
+      transform: none;
+      opacity: clamp(0, calc(1 - var(--hero) * 3.4), 1);
+    }
+  }
+}
+
+@layer components {
+  /* edit mode: everything you could remove says so by not sitting still. small
+     and quick — a big swing reads as broken rather than as waiting */
+  .wobble {
+    animation: wobble 0.24s ease-in-out infinite alternate;
+  }
+
+  @keyframes wobble {
+    from {
+      transform: rotate(-0.55deg) translate3d(0, -0.5px, 0);
+    }
+    to {
+      transform: rotate(0.55deg) translate3d(0, 0.5px, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wobble {
+      animation: none;
+    }
+  }
+}
