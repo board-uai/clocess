@@ -16,7 +16,6 @@ backend/logs/
 *.env*
 !.env.example
 !.env.frontend.example
-!.env.production
 
 compose.override.yaml
 
@@ -59,5 +58,7 @@ beszel_socket/
 # dozzle docker continer log system
 dozzle_data/users.yaml
 dozzle_data/*/
+dozzle_data/*
+!dozzle_data/users.example.yaml
 
 secrets/*

@@ -6,7 +6,6 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
-    base: '/app/',
     plugins: [react(), tailwindcss()],
     /* must match "paths" in tsconfig.app.json */
     resolve: {

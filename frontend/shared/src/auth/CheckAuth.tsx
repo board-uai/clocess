@@ -13,8 +13,6 @@ export function RequireAuth() {
     const to = rememberedEmail() ? "/signed-out" : "/login";
     const websiteUrl = import.meta.env.VITE_WEBSITE_URL as string | undefined;
     if (websiteUrl) {
-      // websiteUrl may be a bare "/" in production (same-origin path routing);
-      // strip it so "/" + "/login" doesn't become the protocol-relative "//login"
       const base = websiteUrl.replace(/\/$/, "");
       window.location.href = `${base}${to}?from=${encodeURIComponent(location.pathname)}`;
       return null;
