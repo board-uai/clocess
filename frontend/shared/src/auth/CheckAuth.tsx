@@ -1,8 +1,7 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { rememberedEmail, useSession } from "./session";
+import { Outlet } from "react-router-dom";
+import { useSession } from "./session";
 
-export function RequireAuth() {
-  const location = useLocation();
+export function RequireAuth({ loginUrl }: { loginUrl: string }) {
   const { user, status } = useSession();
 
   if (status === "checking") {
@@ -10,20 +9,14 @@ export function RequireAuth() {
   }
 
   if (!user) {
-    const to = rememberedEmail() ? "/signed-out" : "/login";
-    const websiteUrl = import.meta.env.VITE_WEBSITE_URL as string | undefined;
-    if (websiteUrl) {
-      const base = websiteUrl.replace(/\/$/, "");
-      window.location.href = `${base}${to}?from=${encodeURIComponent(location.pathname)}`;
-      return null;
-    }
-    return <Navigate to={to} replace state={{ from: location.pathname }} />;
+    window.location.href = `${loginUrl}/login`;
+    return null;
   }
 
   return <Outlet />;
 }
 
-export function RedirectIfAuthed() {
+export function RedirectIfAuthed({ appUrl }: { appUrl: string }) {
   const { user, status } = useSession();
 
   if (status === "checking") {
@@ -31,12 +24,8 @@ export function RedirectIfAuthed() {
   }
 
   if (user) {
-    const appUrl = import.meta.env.VITE_APP_URL as string | undefined;
-    if (appUrl) {
-      window.location.href = `${appUrl}/account`;
-      return null;
-    }
-    return <Navigate to="/account" replace />;
+    window.location.href = `${appUrl}/account`;
+    return null;
   }
 
   return <Outlet />;

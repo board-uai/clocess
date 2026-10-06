@@ -1,13 +1,11 @@
 import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AuthFooter, AuthPage, Field, FormError, useAuthSubmit, useSession } from '@clocess/shared/auth'
 import { login } from '@clocess/shared/api'
 import { Button } from '@clocess/shared/ui'
 
 export function Login() {
-  const [searchParams] = useSearchParams()
   const { refresh } = useSession()
-  const from = searchParams.get('from') ?? '/account'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,7 +14,7 @@ export function Login() {
     await login({ email, password })
     // the guard reads the provider, not the cookie, so it has to hear about this
     await refresh()
-    window.location.href = `${import.meta.env.VITE_APP_URL}${from}`
+    window.location.href = `${import.meta.env.VITE_APP_URL}/account`
   })
 
   return (

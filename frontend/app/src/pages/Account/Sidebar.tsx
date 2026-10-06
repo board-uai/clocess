@@ -13,7 +13,7 @@ const REST = 'border-line bg-raise text-ink-3 hover:text-ink'
 const ON = 'border-transparent bg-fill text-on-fill'
 
 export function Sidebar() {
-  const signOut = useSignOut()
+  const signOut = useSignOut(`${import.meta.env.VITE_WEBSITE_URL}?leaving=1`)
 
   return (
     <nav

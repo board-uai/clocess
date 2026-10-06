@@ -11,7 +11,7 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        element: <RequireAuth />,
+        element: <RequireAuth loginUrl={import.meta.env.VITE_WEBSITE_URL} />,
         children: [
           {
             path: "account",

@@ -3,7 +3,6 @@ import App from "./App";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { ForgotPassword } from "./pages/ForgotPassword";
-import { SignedOut } from "./pages/SignedOut";
 import { Api, Docs, Documentation, Overview } from "./pages/Docs";
 import { RedirectIfAuthed } from "@clocess/shared/auth";
 import ErrorPage from "./pages/ErrorPage";
@@ -25,12 +24,11 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        element: <RedirectIfAuthed />,
+        element: <RedirectIfAuthed appUrl={import.meta.env.VITE_APP_URL} />,
         children: [
           { path: "login", element: <Login /> },
           { path: "register", element: <Register /> },
           { path: "forgot-password", element: <ForgotPassword /> },
-          { path: "signed-out", element: <SignedOut /> },
         ],
       },
     ],
