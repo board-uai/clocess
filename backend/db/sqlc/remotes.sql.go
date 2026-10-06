@@ -61,6 +61,134 @@ func (q *Queries) CreateRemoteSecret(ctx context.Context, arg CreateRemoteSecret
 	return id, err
 }
 
+const deactivateUserRemote = `-- name: DeactivateUserRemote :execrows
+WITH deleted_secret AS (
+    DELETE FROM remote_secrets
+    WHERE remote_secrets.remote_id IN (
+        SELECT remotes.id FROM remotes WHERE remotes.id = $1 AND remotes.user_id = $2
+    )
+)
+UPDATE remotes
+SET active = false
+WHERE remotes.id = $1 AND remotes.user_id = $2
+`
+
+type DeactivateUserRemoteParams struct {
+	ID     int32 `json:"id"`
+	UserID int32 `json:"user_id"`
+}
+
+func (q *Queries) DeactivateUserRemote(ctx context.Context, arg DeactivateUserRemoteParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deactivateUserRemote, arg.ID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const deleteUserRemote = `-- name: DeleteUserRemote :execrows
+DELETE FROM remotes WHERE id = $1 AND user_id = $2
+`
+
+type DeleteUserRemoteParams struct {
+	ID     int32 `json:"id"`
+	UserID int32 `json:"user_id"`
+}
+
+func (q *Queries) DeleteUserRemote(ctx context.Context, arg DeleteUserRemoteParams) (int64, error) {
+	result, err := q.db.Exec(ctx, deleteUserRemote, arg.ID, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const getAllUserRemotes = `-- name: GetAllUserRemotes :many
+SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1
+`
+
+type GetAllUserRemotesRow struct {
+	ID       int32  `json:"id"`
+	Host     string `json:"host"`
+	Port     int32  `json:"port"`
+	Username string `json:"username"`
+	BasePath string `json:"base_path"`
+}
+
+func (q *Queries) GetAllUserRemotes(ctx context.Context, userID int32) ([]GetAllUserRemotesRow, error) {
+	rows, err := q.db.Query(ctx, getAllUserRemotes, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllUserRemotesRow
+	for rows.Next() {
+		var i GetAllUserRemotesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Host,
+			&i.Port,
+			&i.Username,
+			&i.BasePath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRemoteConnection = `-- name: GetRemoteConnection :one
+SELECT
+    remotes.id,
+    remotes.host,
+    remotes.port,
+    remotes.username,
+    remotes.base_path,
+    remotes.host_key_fingerprint,
+    remote_secrets.encrypted_private_key,
+    remote_secrets.key_version
+FROM remotes
+INNER JOIN remote_secrets
+    ON remote_secrets.remote_id = remotes.id
+WHERE remotes.id = $1 AND remotes.user_id = $2
+`
+
+type GetRemoteConnectionParams struct {
+	ID     int32 `json:"id"`
+	UserID int32 `json:"user_id"`
+}
+
+type GetRemoteConnectionRow struct {
+	ID                  int32       `json:"id"`
+	Host                string      `json:"host"`
+	Port                int32       `json:"port"`
+	Username            string      `json:"username"`
+	BasePath            string      `json:"base_path"`
+	HostKeyFingerprint  pgtype.Text `json:"host_key_fingerprint"`
+	EncryptedPrivateKey []byte      `json:"encrypted_private_key"`
+	KeyVersion          int16       `json:"key_version"`
+}
+
+func (q *Queries) GetRemoteConnection(ctx context.Context, arg GetRemoteConnectionParams) (GetRemoteConnectionRow, error) {
+	row := q.db.QueryRow(ctx, getRemoteConnection, arg.ID, arg.UserID)
+	var i GetRemoteConnectionRow
+	err := row.Scan(
+		&i.ID,
+		&i.Host,
+		&i.Port,
+		&i.Username,
+		&i.BasePath,
+		&i.HostKeyFingerprint,
+		&i.EncryptedPrivateKey,
+		&i.KeyVersion,
+	)
+	return i, err
+}
+
 const getRemoteSecret = `-- name: GetRemoteSecret :many
 SELECT remote_id, encrypted_private_key, key_version FROM remote_secrets where remote_id = $1
 `
@@ -81,6 +209,44 @@ func (q *Queries) GetRemoteSecret(ctx context.Context, remoteID pgtype.Int4) ([]
 	for rows.Next() {
 		var i GetRemoteSecretRow
 		if err := rows.Scan(&i.RemoteID, &i.EncryptedPrivateKey, &i.KeyVersion); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUserRemotes = `-- name: GetUserRemotes :many
+SELECT id, host, port, username, base_path FROM remotes WHERE user_id = $1 and active=true
+`
+
+type GetUserRemotesRow struct {
+	ID       int32  `json:"id"`
+	Host     string `json:"host"`
+	Port     int32  `json:"port"`
+	Username string `json:"username"`
+	BasePath string `json:"base_path"`
+}
+
+func (q *Queries) GetUserRemotes(ctx context.Context, userID int32) ([]GetUserRemotesRow, error) {
+	rows, err := q.db.Query(ctx, getUserRemotes, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserRemotesRow
+	for rows.Next() {
+		var i GetUserRemotesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Host,
+			&i.Port,
+			&i.Username,
+			&i.BasePath,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

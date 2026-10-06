@@ -13,7 +13,7 @@
     "./theme.css": "./src/theme.css"
   },
   "dependencies": {
-    "@untitledui/icons": "^0.0.22",
+    "@untitledui/icons": "^0.0.23",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.2",

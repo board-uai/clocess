@@ -53,7 +53,7 @@ func AddUserRemote(c *echo.Context, logger *zerolog.Logger, redis *redis.Client,
 		return echo.NewHTTPError(http.StatusInternalServerError, "internal server error")
 	}
 
-	fingerprints, err := CheckRemote(&remoteContext, logger, decryptPrivateKey)
+	fingerprints, err := CheckRemote(&remoteContext, logger, decryptPrivateKey, "")
 	if err != nil {
 		logger.Err(err).Msg("failed to check remote")
 		return echo.NewHTTPError(http.StatusBadRequest, "bad request")

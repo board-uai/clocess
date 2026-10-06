@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 )
 
-func (s Storage) Save(userID int, fileID int, filename string, src io.Reader) (diskPath string, err error) {
+func (s Storage) Save(remoteConnectionInfo RemoteConnection, fileID int, filename string, src io.Reader) (diskPath string, err error) {
 	filename = filepath.Base(filename)
-	filePath := fmt.Sprintf("data/%d", userID)
+	filePath := fmt.Sprintf("data/%d", remoteConnectionInfo.UserID)
 
-	if err := os.MkdirAll(filePath, 0o750); err != nil {
+	if err = os.MkdirAll(filePath, 0o750); err != nil {
 		s.Logger.Err(err).Msg("failed to create directory")
 		return "", err
 	}
@@ -39,9 +39,9 @@ func (s Storage) Save(userID int, fileID int, filename string, src io.Reader) (d
 	return fullPath, nil
 }
 
-func (s Storage) Read(userID int, fileID int, filename string) (io.ReadCloser, error) {
+func (s Storage) Read(remoteConnectionInfo RemoteConnection, fileID int, filename string) (io.ReadCloser, error) {
 	filename = filepath.Base(filename)
-	fullPath := filepath.Join(fmt.Sprintf("data/%d", userID), fmt.Sprintf("%d_%s", fileID, filename))
+	fullPath := filepath.Join(fmt.Sprintf("data/%d", remoteConnectionInfo.UserID), fmt.Sprintf("%d_%s", fileID, filename))
 
 	file, err := os.Open(fullPath)
 	if err != nil {
@@ -51,9 +51,9 @@ func (s Storage) Read(userID int, fileID int, filename string) (io.ReadCloser, e
 	return file, nil
 }
 
-func (s Storage) DeleteFile(userID int, fileID int, filename string) error {
+func (s Storage) DeleteFile(remoteConnectionInfo RemoteConnection, fileID int, filename string) error {
 	filename = filepath.Base(filename)
-	fullPath := filepath.Join(fmt.Sprintf("data/%d", userID), fmt.Sprintf("%d_%s", fileID, filename))
+	fullPath := filepath.Join(fmt.Sprintf("data/%d", remoteConnectionInfo.UserID), fmt.Sprintf("%d_%s", fileID, filename))
 
 	if err := os.Remove(fullPath); err != nil {
 		s.Logger.Err(err).Str("filePath", fullPath).Msg("failed to delete file")

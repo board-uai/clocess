@@ -13,5 +13,6 @@ type downloadFileDTO struct {
 }
 
 type fileUploadDTO struct {
-	File *multipart.FileHeader `form:"file"`
+	File     *multipart.FileHeader `form:"file"`
+	RemoteID int32                 `form:"remote_id"`
 }

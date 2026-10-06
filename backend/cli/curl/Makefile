@@ -5,7 +5,7 @@ ENV_FILE ?= ../../../.env
 REDIS_PASSWORD ?= $(shell grep -E '^REDIS_PASSWORD=' $(ENV_FILE) 2>/dev/null | cut -d '=' -f2-)
 SESSION_ID = $(shell awk -F'\t' '$$6=="session_id"{print $$7}' $(COOKIE_JAR) 2>/dev/null)
 
-.PHONY: ping register login logout deactivate list upload delete download get-key add-remote redis-check
+.PHONY: ping register login logout deactivate list upload delete download get-key add-remote deactivate-remote delete-remote redis-check
 
 ping:
 	curl -s $(BASE_URL)/health/ping -w "\nHTTP %{http_code}\n"
@@ -43,13 +43,14 @@ deactivate:
 		-w "\nHTTP %{http_code}\n"
 
 
-list:
+get-files:
 	curl -s -b $(COOKIE_JAR) $(BASE_URL)/file/get_all \
 		-w "\nHTTP %{http_code}\n"
 
 upload:
 	curl -s -b $(COOKIE_JAR) -X POST $(BASE_URL)/file/upload \
 		-F "file=@$(FILE)" \
+		-F "remote_id=$(REMOTE_ID)" \
 		-w "\nHTTP %{http_code}\n"
 
 delete:
@@ -65,6 +66,22 @@ download:
 
 get-key:
 	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/get_key \
+		-w "\nHTTP %{http_code}\n"
+
+deactivate-remote:
+	curl -s -b $(COOKIE_JAR) -X POST $(BASE_URL)/remote/deactivate \
+		-H "Content-Type: application/json" \
+		-d '{"remote_id":$(REMOTE_ID)}' \
+		-w "\nHTTP %{http_code}\n"
+
+delete-remote:
+	curl -s -b $(COOKIE_JAR) -X POST $(BASE_URL)/remote/delete \
+		-H "Content-Type: application/json" \
+		-d '{"remote_id":$(REMOTE_ID)}' \
+		-w "\nHTTP %{http_code}\n"
+
+get-remotes:
+	curl -s -b $(COOKIE_JAR) $(BASE_URL)/remote/get_remotes \
 		-w "\nHTTP %{http_code}\n"
 
 # PUBLIC_KEY must be the exact "publicClientKey" value from `make get-key`

@@ -38,6 +38,10 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 			return auth.GetUserInfo(c, logger, redis)
 		})
 
+		r.POST("/forgot_password", func(c *echo.Context) error {
+			return auth.ForgotPassword(c, logger, redis)
+		})
+
 		// user/settings/[endpoint]
 		Group(r, "/settings", func(r *echo.Group) {
 			r.POST("/deactivate", func(c *echo.Context) error {
@@ -57,15 +61,15 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 		})
 
 		r.POST("/delete", func(c *echo.Context) error {
-			return files.DeleteFile(c, logger, redis, storage)
+			return files.DeleteFile(c, logger, redis, storage, masterKey)
 		})
 
 		r.POST("/upload", func(c *echo.Context) error {
-			return files.UploadUserFile(c, logger, redis, storage)
+			return files.UploadUserFile(c, logger, redis, storage, masterKey)
 		})
 
 		r.GET("/download", func(c *echo.Context) error {
-			return files.DownloadUserFile(c, logger, redis, storage)
+			return files.DownloadUserFile(c, logger, redis, storage, masterKey)
 		})
 	})
 
@@ -75,8 +79,28 @@ func SetupRoutes(api *echo.Group, logger *zerolog.Logger, redis *redis.Client, s
 			return remotes.GetPublicKey(c, logger, redis, masterKey)
 		})
 
+		r.GET("/get_remotes", func(c *echo.Context) error {
+			return remotes.GetAllUserRemotes(c, logger, redis)
+		})
+
 		r.POST("/add_remote", func(c *echo.Context) error {
 			return remotes.AddUserRemote(c, logger, redis, masterKey)
+		})
+
+		r.POST("/edit_remote", func(c *echo.Context) error {
+			return remotes.EditRemoteData(c, logger, redis)
+		})
+
+		r.POST("/remote_setup", func(c *echo.Context) error {
+			return remotes.RemoteSetUp(c, logger, redis)
+		})
+
+		r.POST("/deactivate", func(c *echo.Context) error {
+			return remotes.DeactivateRemote(c, logger, redis)
+		})
+
+		r.POST("/delete", func(c *echo.Context) error {
+			return remotes.DeleteRemote(c, logger, redis)
 		})
 	})
 }
